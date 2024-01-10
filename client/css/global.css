@@ -1,0 +1,18 @@
+:root {
+	--beige-color: rgb(110, 110,98);
+	--brown-color: rgb(169, 43,43);
+}
+
+#gameboard{
+    width: 320px;
+    height: 320px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
