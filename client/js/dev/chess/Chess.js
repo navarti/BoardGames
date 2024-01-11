@@ -82,7 +82,7 @@ export default class Chess{
                 square.firstChild?.setAttribute('draggable', true);
                 square.classList.add('square');
                 square.setAttribute('square-row', this.board.length - i - 1);
-                square.setAttribute('square-col', j);
+                square.setAttribute('square-col', this.board.length - j - 1);
 
                 if(i % 2 === 0){
                     square.classList.add(j % 2 === 0 ? 'beige' : 'brown');
@@ -120,13 +120,10 @@ export default class Chess{
             this.showInfoToDisplay('It is not your piece');
             return;
         }
+
         if(e.target.classList.contains('piece')){
-            if(e.target.firstChild.classList.contains(this.playerToMove)){
-                this.showInfoToDisplay('You can not move on cell taken by your other piece');
-                return;
-            }
             this.positionTo = [e.target.parentNode.getAttribute('square-row'), e.target.parentNode.getAttribute('square-col')];
-            if(!this.checkMove()){
+            if(!this.checkMove(this.draggedElement.id, this.playerToMove)){
                 this.showInfoToDisplay('Illegal move');
                 return;
             }
@@ -135,7 +132,7 @@ export default class Chess{
         }
         else{
             this.positionTo = [e.target.getAttribute('square-row'), e.target.getAttribute('square-col')];
-            if(!this.checkMove()){
+            if(!this.checkMove(this.draggedElement.id, this.playerToMove)){
                 this.showInfoToDisplay('Illegal move');
                 return;
             }
@@ -143,6 +140,7 @@ export default class Chess{
         }
         this.updatePosition();
         this.changePlayer();
+        console.log(this.board)
     }
 
     showInfoToDisplay(info){        
@@ -163,83 +161,49 @@ export default class Chess{
         this.playerDisplay.textContent = this.playerToMove;
     }
 
-    checkMove(){
-        const piece = this.draggedElement.id;
+    checkMove(piece, color){
+        function checkMoveByPawn(board, positionFrom, positionTo, opponentColor, row2, row3, row4){
+            //pawn moves forward by 2 cell on its first move
+            if(positionFrom[1] === positionTo[1] && positionFrom[0] === row2 && positionTo[0] === row4){
+                if(board[positionTo[0]][positionTo[1]][0] === '' && board[row3][positionTo[1]][0] === ''){
+                    return true;
+                }
+                return false;
+            }
+            //pawn moves forward
+            if(positionFrom[0] + (row3 - row2) === positionTo[0]){
+                if(positionFrom[1] === positionTo[1] ){
+                    //the cell is free
+                    if(board[positionTo[0]][positionTo[1]][0] === ''){
+                        return true;
+                    }
+                    //the cell is taken
+                    return false;
+                }
+                //pawn eats neighbor
+                if(board[positionTo[0]][positionTo[1]][1] === opponentColor && Math.abs(positionFrom[1] - positionTo[1]) < 2){
+                    return true;
+                }
+            }
+            return false;
+        }
+
         this.positionFrom.forEach((pos, i) => {
             this.positionFrom[i] = parseInt(pos);
         });
         this.positionTo.forEach((pos, i) => {
             this.positionTo[i] = parseInt(pos);
         });
+        if(this.board[this.positionTo[0]][this.positionTo[1]][1] === color){
+            return false;
+        }
         switch(piece){
             case 'pawn':
-                if(this.playerToMove === 'white'){
-                    //pawn moves forward by 2 cell on its first move
-                    if(this.positionFrom[1] === this.positionTo[1] && this.positionFrom[0] === 1 && this.positionTo[0] === 3){
-                        return true;
-                    }
-
-                    if(this.positionFrom[0] + 1 === this.positionTo[0]){
-                        //eats
-                        if(this.board[this.positionTo[0]][this.positionTo[1]][1] === 'black'){
-                            //a pawn eats b pawn  
-                            if(this.positionFrom[1] === 0 && this.positionTo[1] === 1){
-                                return true;
-                            }
-
-                            //h pawns eats g pawn
-                            if(this.positionFrom[1] === this.board.length - 1 && this.positionTo[1] === this.board.length - 1 - 1){
-                                return true;
-                            }
-
-                            //b-g pawns eat neighbors
-                            if(Math.abs(this.positionFrom[1] - this.positionTo[1]) < 2){
-                                return true;
-                            }
-                        }   
-                        //moves
-                        else{
-                            //pawn moves forward by 1 cell
-                            if(this.positionFrom[1] === this.positionTo[1]){
-                                return true;
-                            }
-                        }
-                    }
-                    return false;
+                if(color === 'white'){
+                    return checkMoveByPawn(this.board, this.positionFrom, this.positionTo, 'black', 1, 2, 3);
                 }
                 else{
-                    //pawn moves forward by 2 cell on its first move
-                    if(this.positionFrom[1] === this.positionTo[1] && this.positionFrom[0] === 6 && this.positionTo[0] === 4){
-                        return true;
-                    }
-
-                    if(this.positionFrom[0] - 1 === this.positionTo[0]){
-                        //eats
-                        if(this.board[this.positionTo[0]][this.positionTo[1]][1] === 'white'){
-                            //a pawn eats b pawn  
-                            if(this.positionFrom[1] === 0 && this.positionTo[1] === 1){
-                                return true;
-                            }
-
-                            //h pawns eats g pawn
-                            if(this.positionFrom[1] === this.board.length - 1 && this.positionTo[1] === this.board.length - 1 - 1){
-                                return true;
-                            }
-
-                            //b-g pawns eat neighbors
-                            if(Math.abs(this.positionFrom[1] - this.positionTo[1]) < 2){
-                                return true;
-                            }
-                        }   
-                        //moves
-                        else{
-                            //pawn moves forward by 1 cell
-                            if(this.positionFrom[1] === this.positionTo[1]){
-                                return true;
-                            }
-                        }
-                    }
-                    return false;
+                    return checkMoveByPawn(this.board, this.positionFrom, this.positionTo, 'white', 6, 5, 4);
                 }
             case 'knight':
                 if(Math.abs(this.positionFrom[1]-this.positionTo[1]) === 2 && Math.abs(this.positionFrom[0]-this.positionTo[0]) === 1){
@@ -250,23 +214,20 @@ export default class Chess{
                 }
                 return false;
             case 'bishop':
-                if(Math.abs(this.positionFrom[1]-this.positionTo[1]) === Math.abs(this.positionFrom[0]-this.positionTo[0])){
-                    // TODO: DOESNT WORK NOW
-                    // const minX = Math.min(this.positionFrom[0], this.positionTo[0]) + 1;  
-                    // const maxX = Math.max(this.positionFrom[0], this.positionTo[0]) - 1;  
-                    // const minY = Math.min(this.positionFrom[1], this.positionTo[1]) + 1;
-                    // const maxY = Math.max(this.positionFrom[1], this.positionTo[1]) - 1;  
-
-                    // for(let i=minX; i<maxX; i++){
-                    //     if(this.board[i][maxY][0] !== ''){
-                    //         return false;
-                    //     }
-                    //     maxY--;
-                    // }
-                    
-                    return true;
+                if(Math.abs(this.positionFrom[1]-this.positionTo[1]) !== Math.abs(this.positionFrom[0]-this.positionTo[0])){
+                    return false;
                 }
-                return false;
+                const addX = this.positionFrom[0] > this.positionTo[0] ? -1 : 1;
+                    const addY = this.positionFrom[1] > this.positionTo[1] ? -1 : 1;
+                    let y = this.positionFrom[1] + addY;
+
+                    for(let i=this.positionFrom[0]+addX; addX === 1 ? i<this.positionTo[0] :  i>this.positionTo[0]; i+=addX){
+                        if(this.board[i][y][0] !== ''){
+                            return false;
+                        }
+                        y+=addY;
+                    }                    
+                return true;
             case 'rook':
                 if(this.positionFrom[1] !== this.positionTo[1] && this.positionFrom[0] !== this.positionTo[0]){
                     return false;
@@ -289,8 +250,16 @@ export default class Chess{
                     return true;
                 }
                 return false;
+            case 'queen':
+                const bishopMove = this.checkMove('bishop', color);
+                this.draggedElement.id = 'rook';
+                const rookMove = this.checkMove('rook', color);
+                this.draggedElement.id = 'queen'
+                if(bishopMove || rookMove){
+                    return true;
+                }
             default:
-                return true;
+                return false;
         }
         return true
     }
