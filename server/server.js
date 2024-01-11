@@ -11,7 +11,8 @@ class Server {
     run() {
         const router = new Router();
 
-        this.server.get('/hi',   (req, res) => router.onHi(req, res));
+        this.server.post('/createGame',   (req, res) => router.onCreateGame(req, res));
+        this.server.post('/game/:gameID',   (req, res) => router.onCreateGame(req, res));
                 
         this.server.listen(this.port, this.onListen());
     }

@@ -1,9 +1,12 @@
 export default class Chess{
     constructor(){
+        this.validator = new Validator();
+
         this.positionFrom = null;
         this.positionTo = null;
         this.draggedElement = null;
         this.board = null;
+        this.playerToMove = null;
 
         this.playerDisplay = document.querySelector('#player')
         this.infoDisplay = document.querySelector('#info-display')
@@ -12,12 +15,6 @@ export default class Chess{
         this.dragStart = this.dragStart.bind(this);
         this.dragOver = this.dragOver.bind(this);
         this.dragDrop = this.dragDrop.bind(this);
-    }
-
-    createBoard(gameBoardHTML, pieces, playerToMove){
-        this.gameBoardHTML = gameBoardHTML;
-        this.playerToMove = playerToMove;
-        this.updatePlayerDisplay();
 
         const king = '<div class="piece" id="king"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M224 0c17.7 0 32 14.3 32 32V48h16c17.7 0 32 14.3 32 32s-14.3 32-32 32H256v48H408c22.1 0 40 17.9 40 40c0 5.3-1 10.5-3.1 15.4L368 400H80L3.1 215.4C1 210.5 0 205.3 0 200c0-22.1 17.9-40 40-40H192V112H176c-17.7 0-32-14.3-32-32s14.3-32 32-32h16V32c0-17.7 14.3-32 32-32zM38.6 473.4L80 432H368l41.4 41.4c4.2 4.2 6.6 10 6.6 16c0 12.5-10.1 22.6-22.6 22.6H54.6C42.1 512 32 501.9 32 489.4c0-6 2.4-11.8 6.6-16z"/></svg></div>';
         const queen = '<div class="piece" id="queen"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M256 0a56 56 0 1 1 0 112A56 56 0 1 1 256 0zM134.1 143.8c3.3-13 15-23.8 30.2-23.8c12.3 0 22.6 7.2 27.7 17c12 23.2 36.2 39 64 39s52-15.8 64-39c5.1-9.8 15.4-17 27.7-17c15.3 0 27 10.8 30.2 23.8c7 27.8 32.2 48.3 62.1 48.3c10.8 0 21-2.7 29.8-7.4c8.4-4.4 18.9-4.5 27.6 .9c13 8 17.1 25 9.2 38L399.7 400H384 343.6 168.4 128 112.3L5.4 223.6c-7.9-13-3.8-30 9.2-38c8.7-5.3 19.2-5.3 27.6-.9c8.9 4.7 19 7.4 29.8 7.4c29.9 0 55.1-20.5 62.1-48.3zM256 224l0 0 0 0h0zM112 432H400l41.4 41.4c4.2 4.2 6.6 10 6.6 16c0 12.5-10.1 22.6-22.6 22.6H86.6C74.1 512 64 501.9 64 489.4c0-6 2.4-11.8 6.6-16L112 432z"/></svg></div>';
@@ -36,59 +33,33 @@ export default class Chess{
             [[pawn, 'black'], [pawn, 'black'], [pawn, 'black'], [pawn, 'black'], [pawn, 'black'], [pawn, 'black'], [pawn, 'black'], [pawn, 'black']],
             [[rook, 'black'], [knight, 'black'], [bishop, 'black'], [king, 'black'], [queen, 'black'], [bishop, 'black'], [knight, 'black'], [rook, 'black']],
         ];
-
         this.board = startPieces;
-
-        this.board.forEach((row, i) => {
-            row.forEach((startPiece, j) => {
-                const square = document.createElement('div');
-                square.innerHTML = startPiece[0];
-                square.firstChild?.firstChild?.classList.add(startPiece[1]);
-                square.firstChild?.setAttribute('draggable', true);
-                square.classList.add('square');
-                square.setAttribute('square-row', i);
-                square.setAttribute('square-col', j);
-
-                if(i % 2 === 0){
-                    square.classList.add(j % 2 === 0 ? 'brown' : 'beige');
-                }
-                else{
-                    square.classList.add(j % 2 === 0 ? 'beige' : 'brown') ;
-                }  
-        
-                this.gameBoardHTML.append(square);
-            })
-        })
-
-        const allSquares = document.querySelectorAll('#gameboard .square');
-
-        allSquares.forEach(square => {
-            square.addEventListener('dragstart', this.dragStart);
-            square.addEventListener('dragover', this.dragOver);
-            square.addEventListener('drop', this.dragDrop);
-        })
-        this.reverseBoard();
     }
 
-    reverseBoard(){
+    drawBoard(gameBoardHTML, board, playerToMove, forWhite){
+        //this.board = board;
+        this.gameBoardHTML = gameBoardHTML;
+        this.playerToMove = playerToMove;
+        this.updatePlayerDisplay();
         this.gameBoardHTML.innerHTML = '';
 
-        [...this.board].reverse().forEach((row, i) => {
-            row.reverse().forEach((startPiece, j) => {
+        const whiteSquares = forWhite ? 'beige' : 'brown';
+        const blackSquares = forWhite ? 'brown' : 'beige';
+        (forWhite ?  [...this.board].reverse() : this.board).forEach((row, i) => {
+            (forWhite ? row.reverse() : row).forEach((startPiece, j) => {
                 const square = document.createElement('div');
                 square.innerHTML = startPiece[0];
-                square.setAttribute('draggable', false);
                 square.firstChild?.firstChild?.classList.add(startPiece[1]);
                 square.firstChild?.setAttribute('draggable', true);
                 square.classList.add('square');
-                square.setAttribute('square-row', this.board.length - i - 1);
-                square.setAttribute('square-col', this.board.length - j - 1);
+                square.setAttribute('square-row', forWhite ? this.board.length - i - 1 : i);
+                square.setAttribute('square-col', forWhite ? this.board.length - j - 1 : j);
 
                 if(i % 2 === 0){
-                    square.classList.add(j % 2 === 0 ? 'beige' : 'brown');
+                    square.classList.add(j % 2 === 0 ? whiteSquares : blackSquares);
                 }
                 else{
-                    square.classList.add(j % 2 === 0 ? 'brown' : 'beige') ;
+                    square.classList.add(j % 2 === 0 ? blackSquares : whiteSquares) ;
                 }  
         
                 this.gameBoardHTML.append(square);
@@ -116,14 +87,10 @@ export default class Chess{
 
     dragDrop(e){
         e.stopPropagation();
-        if(!this.draggedElement.firstChild.classList.contains(this.playerToMove)){
-            this.showInfoToDisplay('It is not your piece');
-            return;
-        }
 
         if(e.target.classList.contains('piece')){
             this.positionTo = [e.target.parentNode.getAttribute('square-row'), e.target.parentNode.getAttribute('square-col')];
-            if(!this.checkMove(this.draggedElement.id, this.playerToMove)){
+            if(!this.validator.checkMove(this.board, this.playerToMove, this.draggedElement.id, this.positionFrom, this.positionTo)){
                 this.showInfoToDisplay('Illegal move');
                 return;
             }
@@ -132,7 +99,7 @@ export default class Chess{
         }
         else{
             this.positionTo = [e.target.getAttribute('square-row'), e.target.getAttribute('square-col')];
-            if(!this.checkMove(this.draggedElement.id, this.playerToMove)){
+            if(!this.validator.checkMove(this.board, this.playerToMove, this.draggedElement.id, this.positionFrom, this.positionTo)){
                 this.showInfoToDisplay('Illegal move');
                 return;
             }
@@ -140,7 +107,6 @@ export default class Chess{
         }
         this.updatePosition();
         this.changePlayer();
-        console.log(this.board)
     }
 
     showInfoToDisplay(info){        
@@ -161,84 +127,98 @@ export default class Chess{
         this.playerDisplay.textContent = this.playerToMove;
     }
 
-    checkMove(piece, color){
-        function checkMoveByPawn(board, positionFrom, positionTo, opponentColor, row2, row3, row4){
-            //pawn moves forward by 2 cell on its first move
-            if(positionFrom[1] === positionTo[1] && positionFrom[0] === row2 && positionTo[0] === row4){
-                if(board[positionTo[0]][positionTo[1]][0] === '' && board[row3][positionTo[1]][0] === ''){
-                    return true;
-                }
-                return false;
-            }
-            //pawn moves forward
-            if(positionFrom[0] + (row3 - row2) === positionTo[0]){
-                if(positionFrom[1] === positionTo[1] ){
-                    //the cell is free
-                    if(board[positionTo[0]][positionTo[1]][0] === ''){
-                        return true;
-                    }
-                    //the cell is taken
-                    return false;
-                }
-                //pawn eats neighbor
-                if(board[positionTo[0]][positionTo[1]][1] === opponentColor && Math.abs(positionFrom[1] - positionTo[1]) < 2){
-                    return true;
-                }
-            }
+    updatePosition(){
+        this.board[this.positionFrom[0]][this.positionFrom[1]] = ['', ''];
+        this.board[this.positionTo[0]][this.positionTo[1]] = [this.draggedElement.id, this.playerToMove];
+    }
+}
+
+
+class Validator {
+    checkMove(board, playerToMove, piece, positionFrom, positionTo){
+        positionFrom.forEach((pos, i) => {
+            positionFrom[i] = parseInt(pos);
+        });
+        positionTo.forEach((pos, i) => {
+            positionTo[i] = parseInt(pos);
+        });
+        
+        //check if it is an opponent's piece
+        if(board[positionFrom[0]][positionFrom[1]][1] !== playerToMove){
+            return false;
+        }
+        //check if a person tries to eat an own piece
+        if(board[positionTo[0]][positionTo[1]][1] === playerToMove){
             return false;
         }
 
-        this.positionFrom.forEach((pos, i) => {
-            this.positionFrom[i] = parseInt(pos);
-        });
-        this.positionTo.forEach((pos, i) => {
-            this.positionTo[i] = parseInt(pos);
-        });
-        if(this.board[this.positionTo[0]][this.positionTo[1]][1] === color){
-            return false;
-        }
         switch(piece){
             case 'pawn':
-                if(color === 'white'){
-                    return checkMoveByPawn(this.board, this.positionFrom, this.positionTo, 'black', 1, 2, 3);
+                function checkMoveByPawn(row2, row3, row4){
+                    //pawn moves forward by 2 cell on its first move
+                    if(positionFrom[1] === positionTo[1] && positionFrom[0] === row2 && positionTo[0] === row4){
+                        if(board[positionTo[0]][positionTo[1]][0] === '' && board[row3][positionTo[1]][0] === ''){
+                            return true;
+                        }
+                        return false;
+                    }
+                    //pawn moves forward
+                    if(positionFrom[0] + (row3 - row2) === positionTo[0]){
+                        if(positionFrom[1] === positionTo[1] ){
+                            //the cell is free
+                            if(board[positionTo[0]][positionTo[1]][0] === ''){
+                                return true;
+                            }
+                            //the cell is taken
+                            return false;
+                        }
+                        //pawn eats neighbor
+                        if(board[positionTo[0]][positionTo[1]][1] !== playerToMove && Math.abs(positionFrom[1] - positionTo[1]) < 2){
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                if(playerToMove === 'white'){
+                    return checkMoveByPawn(1, 2, 3);
                 }
                 else{
-                    return checkMoveByPawn(this.board, this.positionFrom, this.positionTo, 'white', 6, 5, 4);
+                    return checkMoveByPawn(6, 5, 4);
                 }
             case 'knight':
-                if(Math.abs(this.positionFrom[1]-this.positionTo[1]) === 2 && Math.abs(this.positionFrom[0]-this.positionTo[0]) === 1){
+                if(Math.abs(positionFrom[1]-positionTo[1]) === 2 && Math.abs(positionFrom[0]-positionTo[0]) === 1){
                     return true;
                 }
-                if(Math.abs(this.positionFrom[1]-this.positionTo[1]) === 1 && Math.abs(this.positionFrom[0]-this.positionTo[0]) === 2){
+                if(Math.abs(positionFrom[1]-positionTo[1]) === 1 && Math.abs(positionFrom[0]-positionTo[0]) === 2){
                     return true;
                 }
                 return false;
             case 'bishop':
-                if(Math.abs(this.positionFrom[1]-this.positionTo[1]) !== Math.abs(this.positionFrom[0]-this.positionTo[0])){
+                if(Math.abs(positionFrom[1]-positionTo[1]) !== Math.abs(positionFrom[0]-positionTo[0])){
                     return false;
                 }
-                const addX = this.positionFrom[0] > this.positionTo[0] ? -1 : 1;
-                    const addY = this.positionFrom[1] > this.positionTo[1] ? -1 : 1;
-                    let y = this.positionFrom[1] + addY;
+                const addX = positionFrom[0] > positionTo[0] ? -1 : 1;
+                    const addY = positionFrom[1] > positionTo[1] ? -1 : 1;
+                    let y = positionFrom[1] + addY;
 
-                    for(let i=this.positionFrom[0]+addX; addX === 1 ? i<this.positionTo[0] :  i>this.positionTo[0]; i+=addX){
-                        if(this.board[i][y][0] !== ''){
+                    for(let i=positionFrom[0]+addX; addX === 1 ? i<positionTo[0] :  i>positionTo[0]; i+=addX){
+                        if(board[i][y][0] !== ''){
                             return false;
                         }
                         y+=addY;
                     }                    
                 return true;
             case 'rook':
-                if(this.positionFrom[1] !== this.positionTo[1] && this.positionFrom[0] !== this.positionTo[0]){
+                if(positionFrom[1] !== positionTo[1] && positionFrom[0] !== positionTo[0]){
                     return false;
                 }
-                for(let i=Math.min(this.positionFrom[1], this.positionTo[1])+1; i<Math.max(this.positionFrom[1], this.positionTo[1]); i++){
-                    if(this.board[i][this.positionFrom[0]][0] !== ''){
+                for(let i=Math.min(positionFrom[1], positionTo[1])+1; i<Math.max(positionFrom[1], positionTo[1]); i++){
+                    if(board[i][positionFrom[0]][0] !== ''){
                         return false;
                     }
                 }
-                for(let i=Math.min(this.positionFrom[0], this.positionTo[0])+1; i<Math.max(this.positionFrom[0], this.positionTo[0]); i++){
-                    if(this.board[i][this.positionFrom[1]][0] !== ''){
+                for(let i=Math.min(positionFrom[0], positionTo[0])+1; i<Math.max(positionFrom[0], positionTo[0]); i++){
+                    if(board[i][positionFrom[1]][0] !== ''){
                         return false;
                     }
                 }
@@ -246,15 +226,13 @@ export default class Chess{
             case 'king':
                 //write to forbid move under attack
 
-                if(Math.abs(this.positionFrom[1]-this.positionTo[1]) < 2 && Math.abs(this.positionFrom[0]-this.positionTo[0]) < 2){
+                if(Math.abs(positionFrom[1]-positionTo[1]) < 2 && Math.abs(positionFrom[0]-positionTo[0]) < 2){
                     return true;
                 }
                 return false;
             case 'queen':
-                const bishopMove = this.checkMove('bishop', color);
-                this.draggedElement.id = 'rook';
-                const rookMove = this.checkMove('rook', color);
-                this.draggedElement.id = 'queen'
+                const bishopMove = this.checkMove(board, playerToMove, 'bishop', positionFrom, positionTo);
+                const rookMove = this.checkMove(board, playerToMove, 'rook', positionFrom, positionTo);
                 if(bishopMove || rookMove){
                     return true;
                 }
@@ -263,11 +241,4 @@ export default class Chess{
         }
         return true
     }
-
-    updatePosition(){
-        this.board[this.positionFrom[0]][this.positionFrom[1]] = ['', ''];
-        this.board[this.positionTo[0]][this.positionTo[1]] = [this.draggedElement.id, this.playerToMove];
-    }
 }
-
-
