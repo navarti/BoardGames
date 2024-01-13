@@ -3,7 +3,8 @@ import Game from "./chess/game.js";
 class Games {
     constructor() {
         this.counterGameId = 1;
-        this.gameList = []
+        this.gameList = [];
+        this.playersToGamesDict = {};
     }
     
     addGame(idWhite, idBlack){
@@ -12,11 +13,17 @@ class Games {
         if(this.counterGameId === 1000000){
             this.counterGameId = 1;
         }
-        return gameId;
+        this.playersToGamesDict[idWhite] = gameId;
+        this.playersToGamesDict[idBlack] = gameId;
+    }
+
+    getGameByPlayerId(playerId){
+        const game = this.getGameByGameId(this.playersToGamesDict[playerId]);
+        return game;
     }
 
     getGameByGameId(gameId){
-        for(let i=0; i<this.gameList;i++){
+        for(let i=0; i<this.gameList.length;i++){
             if(this.gameList[i].gameId === gameId){
                 return this.gameList[i];
             }

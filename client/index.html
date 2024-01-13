@@ -9,9 +9,20 @@
 
     <header></header>
     <body>
-        <div id="gameboard"></div>
-        <p>It is <span id="player"></span>'s move.</p>
-        <p id="info-display"></p>
+        <div class="connect-section">
+            <div>
+                <label for="playerId">User ID</label>
+                <input id="playerId" type="number">
+                <input id="createButton" type="button" value="Create game">
+                <input id="connectButton" type="button" value="Connect to game">
+            </div>
+
+        </div>
+        <div class="game-section">
+            <div id="gameboard"></div>
+            <p>It is <span id="player"></span>'s move.</p>
+            <p id="info-display"></p>
+        </div>
     </body>
     <footer></footer>
 </html>

@@ -1,19 +1,32 @@
-import makeStruct from "makestruct";
-
 class Game {
     constructor(gameId, idWhite, idBlack) {
-        const player = new makeStruct("id, color");
         this.gameId = gameId;
         this.board = null;
-        this.setStartBoard();
 
-        this.playerWhite = new player(idWhite, 'white');
-        this.playerWhite = new player(idBlack, 'black');
+        this.colors = {
+            playerWhite: 'white',
+            playerBlack: 'black',
+        };
+
+        this.playerIds = {
+            playerWhite: idWhite,
+            playerBlack: idBlack,
+        };
         
-        this.currentPlayer = this.playerWhite;
+        this.playerToMove = this.colors.playerWhite;
+        this.initializePieces();
     }
-    
-    setStartBoard(){
+
+    initializePieces(){
+        this.pieces = {
+            rook: 'rook',
+            knight: 'knight',
+            bishop: 'bishop',
+            king: 'king',
+            queen: 'queen',
+            pawn: 'pawn'
+        };
+
         this.board = [
             [ ['rook', 'white'], ['knight', 'white'], ['bishop', 'white'], ['king', 'white'], ['queen', 'white'], ['bishop', 'white'], ['knight', 'white'], ['rook', 'white']],
             [['pawn', 'white'], ['pawn', 'white'], ['pawn', 'white'], ['pawn', 'white'], ['pawn', 'white'], ['pawn', 'white'], ['pawn', 'white'], ['pawn', 'white']],
@@ -24,7 +37,7 @@ class Game {
             [['pawn', 'black'], ['pawn', 'black'], ['pawn', 'black'], ['pawn', 'black'], ['pawn', 'black'], ['pawn', 'black'], ['pawn', 'black'], ['pawn', 'black']],
             [['rook', 'black'], ['knight', 'black'], ['bishop', 'black'], ['king', 'black'], ['queen', 'black'], ['bishop', 'black'], ['knight', 'black'], ['rook', 'black']],
         ];
-    }    
+    } 
 }
 
 export default Game;

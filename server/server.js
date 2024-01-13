@@ -1,4 +1,5 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 import c from 'chalk';
 import Router from './router.js';
 
@@ -10,9 +11,13 @@ class Server {
     
     run() {
         const router = new Router();
-
-        this.server.post('/createGame',   (req, res) => router.onCreateGame(req, res));
-        this.server.post('/game/:gameID',   (req, res) => router.onCreateGame(req, res));
+        this.server.use(bodyParser.json());
+        this.server.use(bodyParser.urlencoded({
+            extended: true
+          }));
+          this.server.post('/createGame',   (req, res) => router.onCreateGame(req, res));
+        this.server.get('/getGame',   (req, res) => router.onGetGame(req, res));
+        this.server.get('/canCreateGame',   (req, res) => router.onCanCreateGame(req, res));
                 
         this.server.listen(this.port, this.onListen());
     }
