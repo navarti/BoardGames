@@ -9,26 +9,18 @@ class Games {
     
     addGame(idWhite, idBlack){
         const gameId = this.counterGameId++;
-        this.gameList.push(new Game(gameId, idWhite, idBlack));
+        const game = new Game(gameId, idWhite, idBlack);
+        this.gameList.push(game);
         if(this.counterGameId === 1000000){
             this.counterGameId = 1;
         }
-        this.playersToGamesDict[idWhite] = gameId;
-        this.playersToGamesDict[idBlack] = gameId;
+        this.playersToGamesDict[idWhite] = game;
+        this.playersToGamesDict[idBlack] = game;
     }
 
     getGameByPlayerId(playerId){
-        const game = this.getGameByGameId(this.playersToGamesDict[playerId]);
+        const game = this.playersToGamesDict[playerId];
         return game;
-    }
-
-    getGameByGameId(gameId){
-        for(let i=0; i<this.gameList.length;i++){
-            if(this.gameList[i].gameId === gameId){
-                return this.gameList[i];
-            }
-        }
-        return null;
     }
 }
 

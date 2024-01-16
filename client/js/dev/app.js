@@ -1,9 +1,7 @@
 import Chess from './chess/Chess.js';
-import API from './API.js';
 
 export default class App {
     constructor(){
-        this.api = new API();
         this.chess = null;
 
         this.gameInfo = null;
@@ -16,23 +14,23 @@ export default class App {
         document.querySelector('#playerId').value = 1; 
         document.querySelector('#connectButton').onclick = () => {
             const playerId = parseInt(document.querySelector('#playerId').value);
-            if(playerId !== 'Nan'){
+            if(typeof playerId === 'number'){
                 global.playerId = playerId;
             }
             this.launchGame();
         };
         document.querySelector('#createButton').onclick = () => {
             const playerId = parseInt(document.querySelector('#playerId').value);
-            if(playerId !== 'Nan'){
+            if(typeof playerId === 'number'){
                 global.playerId = playerId;
             }
             this.createGame();
         };
     }
 
-    // has game in progress
+    // doesnt have game in progress
     async canCreateGame(){
-        return (await this.api.canCreateGame(global.playerId)).status === 'free';
+        return (await global.api.getStatus(global.playerId)).status === 'free';
     }
 
     async createGame(){
@@ -40,23 +38,27 @@ export default class App {
             alert('You have game in progress');
             return;
         }
-        const application = await this.api.createGame(global.playerId);
+        const application = await global.api.createGame(global.playerId);
         if(application.status === 'waiting'){
             return;
         }
-        await this.getGame(); 
         this.launchGame();
     }
 
     async getGame(){
-        this.gameInfo = await this.api.getGame(global.playerId);
+        this.gameInfo = await global.api.getGame(global.playerId);
     }
 
     async launchGame(){
+        const application = await global.api.getStatus(global.playerId);
+        if(application.status !== 'playing'){
+            alert('You do not have game in progress');
+            return;
+        }
         await this.getGame();
         const gameBoard = document.querySelector('#gameboard');
-        this.chess = new Chess(this.gameInfo);
-        this.chess.drawBoard(gameBoard);
+        this.chess = new Chess(this.gameInfo, gameBoard);
+        this.chess.drawBoard(null);
     }
 }
 

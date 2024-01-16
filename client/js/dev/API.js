@@ -40,7 +40,15 @@ export default class API{
         return await this.GETRequest(this.serverURL + '/getGame?', {playerId: playerId});
     }
 
-    async canCreateGame(playerId){
-        return await this.GETRequest(this.serverURL + '/canCreateGame?', {playerId: playerId});
+    async getStatus(playerId){
+        return await this.GETRequest(this.serverURL + '/getStatus?', {playerId: playerId});
+    }
+
+    async move(positionFrom, positionTo, playerId){
+        return await this.POSTRequest(this.serverURL + '/move', {
+            playerId: playerId, 
+            positionFrom: positionFrom, 
+            positionTo: positionTo
+        });
     }
 }

@@ -17,7 +17,8 @@ class Server {
           }));
           this.server.post('/createGame',   (req, res) => router.onCreateGame(req, res));
         this.server.get('/getGame',   (req, res) => router.onGetGame(req, res));
-        this.server.get('/canCreateGame',   (req, res) => router.onCanCreateGame(req, res));
+        this.server.get('/getStatus',   (req, res) => router.onGetStatus(req, res));
+        this.server.post('/move',   (req, res) => router.onMove(req, res));
                 
         this.server.listen(this.port, this.onListen());
     }

@@ -96,8 +96,8 @@ class Validator {
                 const bishopGame = JSON.parse(JSON.stringify(game));
                 const rookGame = JSON.parse(JSON.stringify(game));
 
-                bishopGame[positionFrom[0]][positionFrom[1]].piece = 'bishop';
-                rookGame[positionFrom[0]][positionFrom[1]].piece = 'rook';
+                bishopGame.board[positionFrom[0]][positionFrom[1]].piece = 'bishop';
+                rookGame.board[positionFrom[0]][positionFrom[1]].piece = 'rook';
 
                 const bishopMove = this.checkMove(bishopGame, positionFrom, positionTo, playerId);
                 const rookMove = this.checkMove(rookGame, positionFrom, positionTo, playerId);
@@ -110,7 +110,6 @@ class Validator {
         }
         return false;
     }
-
 }
 
 export default Validator;
