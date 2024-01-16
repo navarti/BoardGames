@@ -28,34 +28,20 @@ export default class App {
         };
     }
 
-    // doesnt have game in progress
-    async canCreateGame(){
-        return (await global.api.getStatus(global.playerId)).status === 'free';
-    }
-
     async createGame(){
-        if(!(await this.canCreateGame())){
+        if((await global.api.createGame(global.playerId)) !== 200){
             alert('You have game in progress');
             return;
-        }
-        const application = await global.api.createGame(global.playerId);
-        if(application.status === 'waiting'){
-            return;
-        }
-        this.launchGame();
-    }
-
-    async getGame(){
-        this.gameInfo = await global.api.getGame(global.playerId);
+        };
     }
 
     async launchGame(){
-        const application = await global.api.getStatus(global.playerId);
-        if(application.status !== 'playing'){
+        this.gameInfo = null;
+        this.gameInfo = await global.api.getGame(global.playerId);
+        if(!this.gameInfo){
             alert('You do not have game in progress');
             return;
         }
-        await this.getGame();
         const gameBoard = document.querySelector('#gameboard');
         this.chess = new Chess(this.gameInfo, gameBoard);
         this.chess.drawBoard(null);

@@ -14,17 +14,17 @@ class Router {
             this.badRequest(res);
             return;
         }
-        if(global.games.getGameByPlayerId()){
+        if(global.games.getGameByPlayerId(playerId)){
             this.badRequest(res);
             return;
         }
         const players = this.gameDistributor.onCreateGame(playerId); 
         if(!players){
-            res.json({status: 'waiting'});
+            this.ok(res);
             return;
         }
         global.games.addGame(players.player1, players.player2);
-        res.json({status: 'created'});
+        this.ok(res);
     }
 
     // async onCreateGameWithFriend(req, res) {
@@ -46,19 +46,19 @@ class Router {
         res.json(game);
     }
 
-    async onGetStatus(req, res) {
-        res.set('Access-Control-Allow-Origin', '*');
-        const playerId = parseInt(req.query.playerId);
-        if(!this.gameDistributor.onCanCreateGame(playerId)){
-            res.json({status: 'waiting'});
-            return;
-        }
-        if(global.games.getGameByPlayerId(playerId)){
-            res.json({status: 'playing'});
-            return;
-        }
-        res.json({status: 'free'});
-    }
+    // async onGetStatus(req, res) {
+    //     res.set('Access-Control-Allow-Origin', '*');
+    //     const playerId = parseInt(req.query.playerId);
+    //     if(!this.gameDistributor.onCanCreateGame(playerId)){
+    //         res.json({status: 'waiting'});
+    //         return;
+    //     }
+    //     if(global.games.getGameByPlayerId(playerId)){
+    //         res.json({status: 'playing'});
+    //         return;
+    //     }
+    //     res.json({status: 'free'});
+    // }
 
     async onMove(req, res) {
         res.set('Access-Control-Allow-Origin', '*');

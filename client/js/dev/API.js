@@ -14,8 +14,7 @@ export default class API{
         };
     
         const res = await fetch(url, options);
-        const json = await res.json();
-        return json;
+        return res;
     }
     
     async GETRequest(url, params){
@@ -28,27 +27,26 @@ export default class API{
         };
     
         const res = await fetch(url, options);
+        if(res.status === 400){
+            return null;
+        }
         const json = await res.json();
         return json;
     }
 
     async createGame(playerId){
-        return await this.POSTRequest(this.serverURL + '/createGame', {playerId: playerId});
+        return (await this.POSTRequest(this.serverURL + '/createGame', {playerId: playerId})).status;
     }
 
     async getGame(playerId){
         return await this.GETRequest(this.serverURL + '/getGame?', {playerId: playerId});
     }
 
-    async getStatus(playerId){
-        return await this.GETRequest(this.serverURL + '/getStatus?', {playerId: playerId});
-    }
-
     async move(positionFrom, positionTo, playerId){
-        return await this.POSTRequest(this.serverURL + '/move', {
+        return (await this.POSTRequest(this.serverURL + '/move', {
             playerId: playerId, 
             positionFrom: positionFrom, 
             positionTo: positionTo
-        });
+        })).status;
     }
 }

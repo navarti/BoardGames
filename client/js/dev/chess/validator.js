@@ -35,7 +35,7 @@ class Validator {
                             return false;
                         }
                         //pawn eats neighbor
-                        if(game.board[positionTo[0]][positionTo[1]].color !== playerToMove && Math.abs(positionFrom[1] - positionTo[1]) < 2){
+                        if(Math.abs(positionFrom[1] - positionTo[1]) < 2){
                             return true;
                         }
                     }
