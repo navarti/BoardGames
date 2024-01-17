@@ -36,12 +36,8 @@ export default class App {
         };
     }
 
-    async createGame(){
-        
-
-    }
-
-    async launchGame(){        
+    async launchGame(){      
+        document.querySelector('.game-section').style.display = 'flex';
         const gameBoard = document.querySelector('#gameboard');
         this.chess = new Chess(this.socket, gameBoard);
     }
