@@ -1,10 +1,8 @@
-import Validator from "./validator.js";
-
 export default class Chess{
-    constructor(gameInfo, gameBoardHTML){
-        this.validator = new Validator();
-        
-        this.gameInfo = gameInfo;
+    constructor(socket, gameBoardHTML){
+        this.gameInfo = null;
+
+        this.socket = socket;
 
         this.positionFrom = null;
         this.positionTo = null;
@@ -18,12 +16,24 @@ export default class Chess{
         this.dragStart = this.dragStart.bind(this);
         this.dragOver = this.dragOver.bind(this);
         this.dragDrop = this.dragDrop.bind(this);
+
+        this.socket.on('send-game', game => {
+            this.gameInfo = game;
+            this.drawBoard(null);
+        });
+
+        this.socket.on('send-error', () => {
+            this.infoDisplay.textContent = 'Illegal move';    
+        });
+        
+        this.socket.emit('get-game', global.playerId);
     }
 
     drawBoard(forWhite){
         this.gameBoardHTML.innerHTML = '';
+        this.infoDisplay.textContent = '';
         
-        this.playerDisplay.textContent = this.gameInfo.playerToMove;
+        this.playerDisplay.textContent = this.gameInfo.colors[this.gameInfo.playerToMove];
 
         this.piecesToHTML = {
             'king': '<div class="piece" id="king"><svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc.--><path d="M224 0c17.7 0 32 14.3 32 32V48h16c17.7 0 32 14.3 32 32s-14.3 32-32 32H256v48H408c22.1 0 40 17.9 40 40c0 5.3-1 10.5-3.1 15.4L368 400H80L3.1 215.4C1 210.5 0 205.3 0 200c0-22.1 17.9-40 40-40H192V112H176c-17.7 0-32-14.3-32-32s14.3-32 32-32h16V32c0-17.7 14.3-32 32-32zM38.6 473.4L80 432H368l41.4 41.4c4.2 4.2 6.6 10 6.6 16c0 12.5-10.1 22.6-22.6 22.6H54.6C42.1 512 32 501.9 32 489.4c0-6 2.4-11.8 6.6-16z"/></svg></div>',
@@ -87,47 +97,20 @@ export default class Chess{
         e.stopPropagation();
 
         if(e.target.classList.contains('piece')){
-            this.positionTo = [e.target.parentNode.getAttribute('square-row'), e.target.parentNode.getAttribute('square-col')];
-            if(!this.check()){
-                return;
-            }
-            e.target.parentNode.append(this.draggedElement);
-            e.target.remove();
+            this.positionTo = [e.target.parentNode.getAttribute('square-row'), e.target.parentNode.getAttribute('square-col')];            
+            // e.target.parentNode.append(this.draggedElement);
+            // e.target.remove();
         }
         else{
             this.positionTo = [e.target.getAttribute('square-row'), e.target.getAttribute('square-col')];
-            if(!this.check()){
-                return;
-            }
-            e.target.append(this.draggedElement);
+            // e.target.append(this.draggedElement);
         }
-        global.api.move(this.positionFrom, this.positionTo, global.playerId);
-        this.updateData();
+        this.sendMove();
     }
 
-    check(){
+    sendMove(){
         this.positionFrom = this.positionFrom.map(Number);
         this.positionTo = this.positionTo.map(Number);
-        if(!this.validator.checkMove(this.gameInfo, this.positionFrom, this.positionTo, global.playerId)){
-            this.infoDisplay.textContent = 'Illegal move';
-            return false;
-        }
-        return true;
-    }
-
-    updateData(){
-        this.infoDisplay.textContent = '';
-        if(this.gameInfo.playerToMove === 'white'){
-            this.gameInfo.playerToMove = 'black';
-        }
-        else{
-            this.gameInfo.playerToMove = 'white';
-        }
-        this.gameInfo.board[this.positionTo[0]][this.positionTo[1]] = {
-            piece: this.gameInfo.board[this.positionFrom[0]][this.positionFrom[1]].piece, 
-            color: this.gameInfo.board[this.positionFrom[0]][this.positionFrom[1]].color
-        };
-        this.gameInfo.board[this.positionFrom[0]][this.positionFrom[1]] = {piece: '', color: ''};
-        this.playerDisplay.textContent = this.gameInfo.playerToMove;          
+        this.socket.emit('send-move', this.positionFrom, this.positionTo, global.playerId);
     }
 }

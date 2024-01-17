@@ -5,6 +5,7 @@ class Games {
         this.counterGameId = 1;
         this.gameList = [];
         this.playersToGamesDict = {};
+        this.playersToGamesDict = {};
     }
     
     addGame(idWhite, idBlack){

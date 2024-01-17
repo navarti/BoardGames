@@ -3,6 +3,10 @@ class GameDistributor {
         this.playersInQueue = [];
     }
 
+    inQueue(playerId){
+        return this.playersInQueue.includes(playerId);
+    }
+
     onCreateGame(playerId) {
         if(this.playersInQueue.length === 0){
             this.playersInQueue.push(playerId);

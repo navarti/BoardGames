@@ -1,17 +1,17 @@
 class Validator {
     checkMove(game, positionFrom, positionTo, playerId){
         //check if the move is done by current player
-        if(game.playerToMove !== game.colors[playerId]){
+        if(game.colors[game.playerToMove] !== game.colors[playerId]){
             return false;
         }
         
         //check if it is an opponent's piece
-        if(game.board[positionFrom[0]][positionFrom[1]].color !== game.playerToMove){
+        if(game.board[positionFrom[0]][positionFrom[1]].color !== game.colors[game.playerToMove]){
             return false;
         }
         
         //check if a person tries to eat an own piece
-        if(game.board[positionTo[0]][positionTo[1]].color === game.playerToMove){
+        if(game.board[positionTo[0]][positionTo[1]].color === game.colors[game.playerToMove]){
             return false;
         }
 
@@ -42,7 +42,7 @@ class Validator {
                     }
                     return false;
                 }
-                if(game.playerToMove === 'white'){
+                if(game.colors[game.playerToMove] === 'white'){
                     return checkMoveByPawn(1, 2, 3);
                 }
                 else{
@@ -97,8 +97,8 @@ class Validator {
                 const bishopGame = JSON.parse(JSON.stringify(game));
                 const rookGame = JSON.parse(JSON.stringify(game));
 
-                bishopGame[positionFrom[0]][positionFrom[1]].piece = 'bishop';
-                rookGame[positionFrom[0]][positionFrom[1]].piece = 'rook';
+                bishopGame.board[positionFrom[0]][positionFrom[1]].piece = 'bishop';
+                rookGame.board[positionFrom[0]][positionFrom[1]].piece = 'rook';
 
                 const bishopMove = this.checkMove(bishopGame, positionFrom, positionTo, playerId);
                 const rookMove = this.checkMove(rookGame, positionFrom, positionTo, playerId);

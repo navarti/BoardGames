@@ -1,6 +1,8 @@
 import Logger from './logger.js';
-import Server from './server.js';
+import App from './app.js';
 import Games from './games.js';
+import GameDistributor from './gameDistributor.js';
+
 process.on('unhandledRejection', (error) => {
     console.log('Unhandled Rejection at: ', error);
 });
@@ -9,8 +11,11 @@ let logger = new Logger();
 global.logger = logger;
 let games = new Games();
 global.games = games;
+let gameDistributor  = new GameDistributor();
+global.gameDistributor = gameDistributor;
 
-let server = new Server(3000);
+
+let server = new App(3000);
 logger.printLogo();
 server.run();
 

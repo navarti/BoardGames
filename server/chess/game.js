@@ -14,7 +14,7 @@ class Game {
         this.colors[idWhite] = 'white';
         this.colors[idBlack] = 'black';
         
-        this.playerToMove = this.colors[idWhite];
+        this.playerToMove = idWhite;
         this.initializePieces();
     }
 
@@ -93,7 +93,7 @@ class Game {
         if(!this.validator.checkMove(this, positionFrom, positionTo, playerId)){
             return false;
         }
-        this.playerToMove = playerId === this.idWhite ? this.colors[this.idBlack] : this.colors[this.idWhite]; 
+        this.playerToMove = playerId === this.idWhite ? this.idBlack : this.idWhite; 
         this.board[positionTo[0]][positionTo[1]] = {
             piece: this.board[positionFrom[0]][positionFrom[1]].piece, 
             color: this.board[positionFrom[0]][positionFrom[1]].color

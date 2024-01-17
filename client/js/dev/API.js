@@ -33,20 +33,4 @@ export default class API{
         const json = await res.json();
         return json;
     }
-
-    async createGame(playerId){
-        return (await this.POSTRequest(this.serverURL + '/createGame', {playerId: playerId})).status;
-    }
-
-    async getGame(playerId){
-        return await this.GETRequest(this.serverURL + '/getGame?', {playerId: playerId});
-    }
-
-    async move(positionFrom, positionTo, playerId){
-        return (await this.POSTRequest(this.serverURL + '/move', {
-            playerId: playerId, 
-            positionFrom: positionFrom, 
-            positionTo: positionTo
-        })).status;
-    }
 }
