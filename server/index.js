@@ -7,6 +7,7 @@ process.on('unhandledRejection', (error) => {
     console.log('Unhandled Rejection at: ', error);
 });
 
+//maybe remove from global
 let logger = new Logger();
 global.logger = logger;
 let games = new Games();
@@ -16,6 +17,5 @@ global.gameDistributor = gameDistributor;
 
 
 let server = new App(3000);
-logger.printLogo();
 server.run();
 

@@ -28,6 +28,7 @@ class App {
     }
 
     onListen() {
+        global.logger.printLogo();
         global.logger.printInfo(`${c.cyan('BoardGames Server')} ${c.green(`is running on port ${this.port}`)}`);
     }
 }

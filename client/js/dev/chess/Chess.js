@@ -1,8 +1,9 @@
 export default class Chess{
-    constructor(socket, gameBoardHTML){
+    constructor(gameBoardHTML){
+        this.storage = window.storage;
+        this.socket = this.storage.socket.socket;
+        
         this.gameInfo = null;
-
-        this.socket = socket;
 
         this.positionFrom = null;
         this.positionTo = null;
@@ -17,8 +18,10 @@ export default class Chess{
         this.dragOver = this.dragOver.bind(this);
         this.dragDrop = this.dragDrop.bind(this);
 
+        //socket requests
         this.socket.on('send-game', game => {
             this.gameInfo = game;
+            this.forWhite = this.gameInfo.idWhite === this.storage.playerId;
             this.drawBoard(null);
         });
 
@@ -26,10 +29,24 @@ export default class Chess{
             this.infoDisplay.textContent = 'Illegal move';    
         });
         
-        this.socket.emit('get-game', global.playerId);
+        this.socket.emit('get-game', this.storage.playerId);
+
+        //bind revert board button
+        document.querySelector('#revertBoardButton').onclick = (e) => {
+            e.preventDefault();
+            this.forWhite = !this.forWhite;
+            this.drawBoard();
+        }
+
+        // //bind change theme button
+        // document.querySelector('#changeThemeButton').onclick = (e) => {
+        //     e.preventDefault();
+        //     this.changeBoardTheme(null);
+        //     this.drawBoard();
+        // }
     }
 
-    drawBoard(forWhite){
+    drawBoard(){
         this.gameBoardHTML.innerHTML = '';
         this.infoDisplay.textContent = '';
         
@@ -45,29 +62,27 @@ export default class Chess{
             '': ''
         }
 
-        //to Fix
-        if(forWhite === null){
-            forWhite = this.gameInfo.idWhite === global.playerId;
-        }
+        const whiteSquares = localStorage.lightSquares;
+        const blackSquares = localStorage.darkSquares;
 
-        const whiteSquares = forWhite ? 'beige' : 'brown';
-        const blackSquares = forWhite ? 'brown' : 'beige';
+        const squares1 = this.forWhite ? whiteSquares : blackSquares;
+        const squares2 = this.forWhite ? blackSquares : whiteSquares;
 
-        (forWhite ?  [...this.gameInfo.board].reverse() : this.gameInfo.board).forEach((row, i) => {
-            (forWhite ? [...row].reverse() : row).forEach((startPiece, j) => {
+        (this.forWhite ?  [...this.gameInfo.board].reverse() : this.gameInfo.board).forEach((row, i) => {
+            (this.forWhite ? [...row].reverse() : row).forEach((startPiece, j) => {
                 const square = document.createElement('div');
                 square.innerHTML = this.piecesToHTML[startPiece.piece];
                 square.firstChild?.firstChild?.classList.add(startPiece.color);
                 square.firstChild?.setAttribute('draggable', true);
                 square.classList.add('square');
-                square.setAttribute('square-row', forWhite ? this.gameInfo.board.length - i - 1 : i);
-                square.setAttribute('square-col', forWhite ? this.gameInfo.board.length - j - 1 : j);
+                square.setAttribute('square-row', this.forWhite ? this.gameInfo.board.length - i - 1 : i);
+                square.setAttribute('square-col', this.forWhite ? this.gameInfo.board.length - j - 1 : j);
 
                 if(i % 2 === 0){
-                    square.classList.add(j % 2 === 0 ? whiteSquares : blackSquares);
+                    square.classList.add(j % 2 === 0 ? squares1 : squares2);
                 }
                 else{
-                    square.classList.add(j % 2 === 0 ? blackSquares : whiteSquares) ;
+                    square.classList.add(j % 2 === 0 ? squares2 : squares1) ;
                 }  
         
                 this.gameBoardHTML.append(square);

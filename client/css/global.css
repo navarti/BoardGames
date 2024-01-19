@@ -1,6 +1,8 @@
 :root {
-	--beige-color: rgb(110, 110,98);
-	--brown-color: rgb(169, 43,43);
+	--theme1Light-color: #e3c16f;
+	--theme1Dark-color: #b88b4a;
+	--theme2Light-color: rgb(110, 110,98);
+	--theme2Dark-color: rgb(169, 43,43);
 }
 
 body {
