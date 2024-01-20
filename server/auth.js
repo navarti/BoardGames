@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 
 class Auth {
     constructor() {
-        this.config = global.storage.config;
+        this.config = JSON.parse(global.fileManager.getConfig());
     }
 
     getClient() {
@@ -73,9 +73,8 @@ class Auth {
 
         if(    data.email 
             && data.email_verified 
-            && data.email.includes('@nure.ua') 
             && data.email_verified == true) {
-                this.saveUser(data);
+                console.log(data.email);
                 return true;
             }
 

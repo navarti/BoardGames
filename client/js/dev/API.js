@@ -24,13 +24,22 @@ export default class API{
     
         const options = {
             method: 'GET',
+            credentials: 'include'
         };
     
         const res = await fetch(url, options);
+        return res;
+    }
+
+    async getJsonFromRes(res){
         if(res.status === 400){
             return null;
         }
         const json = await res.json();
         return json;
+    }
+
+    async authorize(){
+        await this.GETRequest(this.serverURL + '/authorize');
     }
 }

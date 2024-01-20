@@ -1,4 +1,4 @@
-export default class boardTheme{
+export default class BoardTheme{
     constructor(){
         if(!localStorage.boardThemeNum){
             localStorage.boardThemeNum = 0;

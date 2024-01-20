@@ -1,20 +1,23 @@
 import Chess from './chess/Chess.js';
 import BoardTheme from './boardTheme.js';
 import Storage from './storage.js';
+import Auth from './auth.js';
 
 export default class App {
     constructor(){
         window.storage = new Storage();
         this.storage = window.storage;
 
+        this.auth = new Auth();
+
         this.boardTheme = new BoardTheme();
 
         this.socket = this.storage.socket.socket;
         this.chess = null;
 
-        this.socket.on('send-alert', warning => {
-            alert(warning);
-        });
+        // this.socket.on('send-alert', warning => {
+        //     alert(warning);
+        // });
         this.socket.on('game-ready', () => {
             this.launchGame();
         });
