@@ -3,7 +3,7 @@
 export default class Auth {
     constructor() {
         this.storage = window.storage;
-        this.storage.api.authorize();
+        this.storage.api.getClientCookies();
 
         if(!this.check()) {
             this.setVisibility('deauthed');

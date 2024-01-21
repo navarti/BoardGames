@@ -126,6 +126,6 @@ export default class Chess{
     sendMove(){
         this.positionFrom = this.positionFrom.map(Number);
         this.positionTo = this.positionTo.map(Number);
-        this.socket.emit('send-move', this.positionFrom, this.positionTo, global.playerId);
+        this.socket.emit('send-move', this.positionFrom, this.positionTo, this.storage.playerId);
     }
 }

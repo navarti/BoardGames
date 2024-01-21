@@ -8,6 +8,8 @@ process.on('unhandledRejection', (error) => {
     console.log('Unhandled Rejection at: ', error);
 });
 
+global.client = ["http://127.0.0.1:5500", "http://127.0.0.1:5500/client", "http://localhost", "http://localhost/client"];
+
 //maybe remove from global
 let logger = new Logger();
 global.logger = logger;

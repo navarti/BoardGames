@@ -12,7 +12,7 @@ class Auth {
     }
 
     getRedirect() {
-        if(this.config.main) return `${this.config.main}/auth`;
+        if(this.config.main) return this.config.redirect;
         return null;
     }
 
@@ -63,7 +63,7 @@ class Auth {
             let payload = Buffer.from(base64Payload, 'base64');
             return JSON.parse(payload.toString());
         } catch (e) {
-            //console.log(e);
+            console.log(e);
             return null;
         }
     }

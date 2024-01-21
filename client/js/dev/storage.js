@@ -15,7 +15,9 @@ export default class Storage{
     }
 
     getClient() {
-        return "546194974490-rl2uga1t72bha3fs0ci30uv9h0s7ovuh.apps.googleusercontent.com";
+        let client = this.getCookie('client');
+        if(client) return decodeURIComponent(client).split(';');
+        return null;
     }
 
     getAuth() {

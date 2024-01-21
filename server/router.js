@@ -5,17 +5,49 @@ class Router {
         this.auth = new Auth();
     }
 
-    async authorize(req, res){
-        res.set('Access-Control-Allow-Origin', 'http://127.0.0.1:5500');
+    async onClientCookies(req, res){
+        res.set('Access-Control-Allow-Origin', req.headers.origin);
         res.set('Access-Control-Allow-Credentials', 'true');
         
         const data = `${this.auth.getClient()};${this.auth.getRedirect()}`;
-        res.cookie('client', data, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 3600000, path:'/' });
+        res.cookie('client', data, { httpOnly: false, secure: true, sameSite: 'None', maxAge: 3600000, path:'/' });
         res.send('Cookie sent');
         return;
     }
 
-    
+    async onAuth(req, res){
+        res.set('Access-Control-Allow-Origin', req.headers.origin);
+        res.set('Access-Control-Allow-Origin', '*');
+        res.set('Access-Control-Allow-Credentials', 'true');
+        
+        const redirect = this.auth.getMainLink();
+
+        if(!req.query.code) {
+            res.location(redirect);
+            res.sendStatus(302);
+            return;
+        }
+
+        let userData = await this.auth.getToken(req.query.code);
+        let result = await this.auth.parse(userData.id_token);
+
+        if(this.auth.checkAuth(result)) {
+            result = {
+                email: result.email,
+                email_verified: result.email_verified
+            };
+
+            let jwt = this.auth.sign(result);
+            res.cookie('key', jwt, { httpOnly: false, secure: true, sameSite: 'None', maxAge: 3600000, path:'/' });
+            res.clearCookie('client');
+
+            res.location(redirect);
+            res.sendStatus(302);
+        } else {
+            res.location(`${redirect}/?auth=error`);
+            res.sendStatus(302);
+        }
+    }
 
     ok(res){
         res.status(200).send();

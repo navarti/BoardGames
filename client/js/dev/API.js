@@ -39,7 +39,7 @@ export default class API{
         return json;
     }
 
-    async authorize(){
-        await this.GETRequest(this.serverURL + '/authorize');
+    async getClientCookies(){
+        await this.GETRequest(this.serverURL + '/clientCookies');
     }
 }
