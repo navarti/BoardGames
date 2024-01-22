@@ -1,9 +1,6 @@
-
-
 export default class Auth {
     constructor() {
         this.storage = window.storage;
-        this.storage.api.getClientCookies();
 
         if(!this.check()) {
             this.setVisibility('deauthed');
@@ -13,14 +10,7 @@ export default class Auth {
 
         if(this.authError()) {
             // history.pushState(null, null, '/');
-            // let lAuthError = document.querySelector('#l-authError');
-            // if(lAuthError == null) return;
-            // alert(lAuthError.innerHTML);
-            alert('AAAAAAAAAAAAAAAAAA');
-        }
-
-        document.querySelector('#log-in-button').onclick = () => {
-            this.onAuth();
+            alert('Auth error');
         }
     }
 
@@ -29,8 +19,8 @@ export default class Auth {
         return true;
     }
 
-    onAuth() {
-        const url = this.getAuthURL();
+    async onAuth() {
+        const url = await this.getAuthURL();
         window.location.href = url;
     }
 
@@ -40,12 +30,18 @@ export default class Auth {
     }
 
     setVisibility(visibility) {
-        if(visibility == 'authed') {
-            Array.from(document.querySelector('body').children).forEach(element => {
-                element.classList.remove('d-none');
-            });
-            document.querySelector('.log-in-section').classList.add('d-none');
+        const logButton = document.querySelector('#log-button'); 
+        if(visibility === "deauthed"){
+            logButton.innerHTML = 'Log in';
+            logButton.onclick = (e) => {
+                e.preventDefault();
+                this.onAuth();
+            }
             return;
+        }
+        logButton.innerHTML = 'Log out';
+        logButton.onclick = () => {
+            this.onLogout();
         }
     }
 
@@ -55,10 +51,10 @@ export default class Auth {
         return false;
     }
 
-    getAuthURL() {
-        const data = this.storage.getClient();
-        const client = data[0]; 
-        const redirect = data[1];
+    async getAuthURL() {
+        const data = await this.storage.api.getClient();
+        const client = data.client; 
+        const redirect = data.redirect;
         const rootUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
         const options = 
             `redirect_uri=${redirect}` +

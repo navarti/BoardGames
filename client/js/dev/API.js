@@ -24,7 +24,6 @@ export default class API{
     
         const options = {
             method: 'GET',
-            credentials: 'include'
         };
     
         const res = await fetch(url, options);
@@ -39,7 +38,9 @@ export default class API{
         return json;
     }
 
-    async getClientCookies(){
-        await this.GETRequest(this.serverURL + '/clientCookies');
+    async getClient(){
+        const res = await this.GETRequest(this.serverURL + '/client');
+        const data = await this.getJsonFromRes(res);
+        return data;
     }
 }

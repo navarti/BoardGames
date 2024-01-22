@@ -8,19 +8,28 @@ class SocketConfig {
                 methods: ["GET", "POST"]
             }
         });
+        this.socketsToEmailsDict = {};
         this.configRequests();
     }
 
     configRequests(){
         this.io.on('connection', socket => {
-            socket.on('get-game', playerId => {
-                const game = global.games.getGameByPlayerId(playerId);
-                socket.join(playerId);
-                socket.emit('send-game', game);
+            const key = socket.handshake.query['key'];
+            if(!global.auth.checkKey(key)){
+                socket.emit('send-alert', 'Log in to your account!');
+                socket.disconnect(0);
+            }
+            this.socketsToEmailsDict[socket.id] = global.auth.getEmail(key);
+            socket.join(this.socketsToEmailsDict[socket.id]);
+            socket.emit('send-userID', this.socketsToEmailsDict[socket.id]);
+
+            socket.on('get-game', () => {
+                const game = global.games.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);
+                socket.emit('send-game', game, this.socketsToEmailsDict[socket.id]);
             });
-            socket.on('send-move', (positionFrom, positionTo, playerId) => {
-                let game = global.games.getGameByPlayerId(playerId);
-                if(!game.move(positionFrom, positionTo, playerId)){
+            socket.on('send-move', (positionFrom, positionTo) => {
+                let game = global.games.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);
+                if(!game.move(positionFrom, positionTo, this.socketsToEmailsDict[socket.id])){
                     socket.emit('send-error');
                     return;
                 }
@@ -28,21 +37,20 @@ class SocketConfig {
                 socket.to(game.idWhite).emit('send-game', game);
                 socket.to(game.idBlack).emit('send-game', game);
             });
-            socket.on('check-game-in-progress', playerId => {
-                if(global.games.getGameByPlayerId(playerId)){
+            socket.on('check-game-in-progress', () => {
+                if(global.games.getGameByPlayerId(this.socketsToEmailsDict[socket.id])){
                     socket.emit('game-ready');
                     return;
                 }
-                socket.emit('send-alert', 'You dont have game in progress');
             });
-            socket.on('create-game', playerId => {
-                socket.join(playerId);
+            socket.on('create-game', () => {
                 const gd = global.gameDistributor;
-                if(global.games.getGameByPlayerId(playerId) || gd.inQueue(playerId)){
+                if(global.games.getGameByPlayerId(this.socketsToEmailsDict[socket.id]) 
+                    || gd.inQueue(this.socketsToEmailsDict[socket.id])){
                     socket.emit('send-alert', 'You have game in progress');
                     return;
                 }
-                const players = gd.onCreateGame(playerId); 
+                const players = gd.onCreateGame(this.socketsToEmailsDict[socket.id]); 
                 if(!players){
                     return;
                 }

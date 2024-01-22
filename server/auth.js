@@ -74,11 +74,23 @@ class Auth {
         if(    data.email 
             && data.email_verified 
             && data.email_verified == true) {
-                console.log(data.email);
                 return true;
             }
 
         return false;
+    }
+
+    checkKey(key){
+        let user = this.verify(key);
+        if(this.checkAuth(user)) {
+            return true;    
+        }
+        return false;
+    }
+
+    getEmail(key){
+        let user = this.verify(key);
+        return user.email;
     }
 }
 

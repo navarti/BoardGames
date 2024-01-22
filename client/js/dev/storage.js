@@ -5,25 +5,20 @@ export default class Storage{
     constructor(){
         this.playerId = parseInt(localStorage.playerId);
         this.api = new API();
-        this.socket = new Socket();
-    }
-
-    //temporary
-    changePlayerId(playerId){
-        localStorage.playerId = playerId;
-        this.playerId = playerId;
-    }
-
-    getClient() {
-        let client = this.getCookie('client');
-        if(client) return decodeURIComponent(client).split(';');
-        return null;
-    }
+        const key = this.getAuth(); 
+        if(key){
+            this.socket = new Socket(key);
+        }
+    }   
 
     getAuth() {
         let auth = this.getCookie('key');
         if(auth) return auth;
         return null;
+    }
+
+    deleteAuth() {
+        this.deleteCookie('key');
     }
 
     getCookie(name) {

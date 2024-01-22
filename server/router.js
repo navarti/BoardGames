@@ -1,17 +1,11 @@
-import Auth from './auth.js';
-
 class Router {
     constructor() {
-        this.auth = new Auth();
+        
     }
 
-    async onClientCookies(req, res){
-        res.set('Access-Control-Allow-Origin', req.headers.origin);
-        res.set('Access-Control-Allow-Credentials', 'true');
-        
-        const data = `${this.auth.getClient()};${this.auth.getRedirect()}`;
-        res.cookie('client', data, { httpOnly: false, secure: true, sameSite: 'None', maxAge: 3600000, path:'/' });
-        res.send('Cookie sent');
+    async onClient(req, res){
+        res.set('Access-Control-Allow-Origin', '*');
+        res.json({client: global.auth.getClient(), redirect: global.auth.getRedirect()});
         return;
     }
 
@@ -20,7 +14,7 @@ class Router {
         res.set('Access-Control-Allow-Origin', '*');
         res.set('Access-Control-Allow-Credentials', 'true');
         
-        const redirect = this.auth.getMainLink();
+        const redirect = global.auth.getMainLink();
 
         if(!req.query.code) {
             res.location(redirect);
@@ -28,19 +22,18 @@ class Router {
             return;
         }
 
-        let userData = await this.auth.getToken(req.query.code);
-        let result = await this.auth.parse(userData.id_token);
+        let userData = await global.auth.getToken(req.query.code);
+        let result = await global.auth.parse(userData.id_token);
 
-        if(this.auth.checkAuth(result)) {
+        if(global.auth.checkAuth(result)) {
             result = {
                 email: result.email,
                 email_verified: result.email_verified
             };
 
-            let jwt = this.auth.sign(result);
+            let jwt = global.auth.sign(result);
             res.cookie('key', jwt, { httpOnly: false, secure: true, sameSite: 'None', maxAge: 3600000, path:'/' });
-            res.clearCookie('client');
-
+            
             res.location(redirect);
             res.sendStatus(302);
         } else {

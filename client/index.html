@@ -33,29 +33,25 @@
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" id="revertBoardButton" href="">Revert board</a>
-              </li>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Profile</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" id="log-button" href="">Log in</a>
                 </li>
               </ul>
             </div>
           </nav>
     </header>
     <body>
-        <div class="log-in-section">
-          <p>Log in to play chess</p>
-          <input id="log-in-button" type="button" value="Log in">
-        </div>
-        <div class="details-section d-none">
-            <div>
-                <label for="playerId">User ID</label>
-                <input id="playerId" type="number">
-                <input id="createGameButton" type="button" value="Create game">
-                <input id="checkGameButton" type="button" value="Check game in progress">
-            </div>
+        <div class="details-section">
+            <label id="playerId">User ID</label>
+            <label id="playFor">Play For</label>
+            <input id="createGameButton" type="button" value="Create game">
             <p>Welcome to chess</p>
         </div>
-        <div class="game-section d-none">
+        <div class="game-section">
             <div id="gameboard"></div>
             <p>It is <span id="player"></span>'s move.</p>
             <p id="info-display"></p>

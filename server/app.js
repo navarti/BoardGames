@@ -24,7 +24,7 @@ class App {
 
         this.app.use(cookieParser());
 
-        this.app.get('/clientCookies',   (req, res) => router.onClientCookies(req, res));
+        this.app.get('/client',   (req, res) => router.onClient(req, res));
         this.app.get('/auth',   (req, res) => router.onAuth(req, res));
 
         const httpServer = this.app.listen(this.port, this.onListen());

@@ -19,9 +19,11 @@ export default class Chess{
         this.dragDrop = this.dragDrop.bind(this);
 
         //socket requests
-        this.socket.on('send-game', game => {
+        this.socket.on('send-game', (game) => {
             this.gameInfo = game;
-            this.forWhite = this.gameInfo.idWhite === this.storage.playerId;
+            this.forWhite = this.gameInfo.idWhite === this.storage.socket.playerId;
+            document.querySelector('#playFor').innerHTML = 'Play for ' + (this.forWhite ?  'white' : 'black');
+            
             this.drawBoard(null);
         });
 
@@ -29,7 +31,7 @@ export default class Chess{
             this.infoDisplay.textContent = 'Illegal move';    
         });
         
-        this.socket.emit('get-game', this.storage.playerId);
+        this.socket.emit('get-game');
 
         //bind revert board button
         document.querySelector('#revertBoardButton').onclick = (e) => {
@@ -126,6 +128,6 @@ export default class Chess{
     sendMove(){
         this.positionFrom = this.positionFrom.map(Number);
         this.positionTo = this.positionTo.map(Number);
-        this.socket.emit('send-move', this.positionFrom, this.positionTo, this.storage.playerId);
+        this.socket.emit('send-move', this.positionFrom, this.positionTo);
     }
 }
