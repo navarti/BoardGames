@@ -1,4 +1,4 @@
-import Chess from './chess/Chess.js';
+import ChessGame from './chess/chessGame.js';
 import Storage from './storage.js';
 import Auth from './auth.js';
 import BoardTheme from './boardTheme.js';
@@ -10,7 +10,7 @@ export default class App {
         this.auth = new Auth();
         this.boardTheme = new BoardTheme();
 
-        this.chess = new Chess();
+        this.chess = new ChessGame();
 
         if(this.auth.check()){
             this.socketInit();        

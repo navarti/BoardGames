@@ -29,7 +29,7 @@ class Socket {
             });
             socket.on('send-move', (positionFrom, positionTo) => {
                 try{
-                    let game = global.games.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);
+                    const game = global.games.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);
                     if(!game.move(positionFrom, positionTo, this.socketsToEmailsDict[socket.id])){
                         socket.emit('send-error');
                         return;
