@@ -1,20 +1,20 @@
 class Validator {
     checkMove(game, positionFrom, positionTo, playerId){
-        //check if the move is done by current player
-        if(game.colors[game.playerToMove] !== game.colors[playerId]){
-            return false;
-        }
-        
-        //check if it is an opponent's piece
-        if(game.board[positionFrom[0]][positionFrom[1]].color !== game.colors[game.playerToMove]){
-            return false;
-        }
-        
-        //check if a person tries to eat an own piece
-        if(game.board[positionTo[0]][positionTo[1]].color === game.colors[game.playerToMove]){
+        if(!this.checkPlayer(game, positionFrom, positionTo, playerId)){
             return false;
         }
 
+        if(!this.checkMoveByPiece(game, positionFrom, positionTo)){
+            return false;
+        }
+
+        this.checkOwnCheck(game, positionFrom, positionTo);
+
+        checkOpponentCheck(game)
+        return true;
+    }
+
+    checkMoveByPiece(game, positionFrom, positionTo){
         switch(game.board[positionFrom[0]][positionFrom[1]].piece){
             case 'pawn':
                 function checkMoveByPawn(row2, row3, row4){
@@ -42,7 +42,7 @@ class Validator {
                     }
                     return false;
                 }
-                if(game.colors[game.playerToMove] === 'white'){
+                if(game.info[game.playerToMove].color === 'white'){
                     return checkMoveByPawn(1, 2, 3);
                 }
                 else{
@@ -100,8 +100,8 @@ class Validator {
                 bishopGame.board[positionFrom[0]][positionFrom[1]].piece = 'bishop';
                 rookGame.board[positionFrom[0]][positionFrom[1]].piece = 'rook';
 
-                const bishopMove = this.checkMove(bishopGame, positionFrom, positionTo, playerId);
-                const rookMove = this.checkMove(rookGame, positionFrom, positionTo, playerId);
+                const bishopMove = this.checkMoveByPiece(bishopGame, positionFrom, positionTo);
+                const rookMove = this.checkMoveByPiece(rookGame, positionFrom, positionTo);
                 if(bishopMove || rookMove){
                     return true;
                 }
@@ -109,9 +109,81 @@ class Validator {
             default:
                 return false;
         }
+    }
+
+    getLegalMoves(game, playerId){
+        game.board.forEach((row, i) => {
+            row.forEach((square, j) => {
+                if(game.pieces.color === game.info[game.playerToMove].color){
+                    if(this.checkMoveByPiece(game, [i, j], kingPos)){
+                        return true;
+                    }
+                }
+            })
+        });
+
+
+    }
+
+    checkPlayer(game, positionFrom, positionTo, playerId){
+        //check if the move is done by current player
+        if(game.info[game.playerToMove].color !== game.info[playerId].color){
+            return false;
+        }
+        
+        //check if it is an opponent's piece
+        if(game.board[positionFrom[0]][positionFrom[1]].color !== game.info[game.playerToMove].color){
+            return false;
+        }
+        
+        //check if a person tries to eat an own piece
+        if(game.board[positionTo[0]][positionTo[1]].color === game.info[game.playerToMove].color){
+            return false;
+        }
+        return true;
+    }
+
+    // check if opponents king will be under attack
+    checkOpponentCheck(game){
+        game.info[this.playerWaiting].check = false;
+        const kingPos = this.findOpponentKing(game);
+        game.board.forEach((row, i) => {
+            row.forEach((square, j) => {
+                if(game.pieces.color === game.info[game.playerToMove].color){
+                    if(this.checkMoveByPiece(game, [i, j], kingPos)){
+                        return true;
+                    }
+                }
+            })
+        });
+        game.info[this.playerWaiting].check = true;
         return false;
     }
 
+    // check if player's king will be under attack
+    checkOwnCheck(game, positionFrom, positionTo){
+        const newGame = JSON.parse(JSON.stringify(game));
+        
+        newGame.swapPlayers();
+        newGame.updateBoard(positionFrom, positionTo);
+        
+        if(this.checkOpponentCheck(newGame)){
+            return true;
+        }
+        return false;
+    }
+
+    findOpponentKing(game){
+        const kingColor = game.info[this.playerWaiting].color; 
+        game.board.forEach((row, i) => {
+            row.forEach((square, j) => {
+                if(game.pieces.king === square.piece && square.color === kingColor){
+                    return [i, j];
+                }
+            })
+        })
+        return null;
+    }
 }
 
 export default Validator;

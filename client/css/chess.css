@@ -1,25 +1,6 @@
-.square{
-    height: 40px;
-    width: 40px;
-}
 
-.square svg{
-    height: 30px;
-    width: 30px;
-    margin: 5px;
-    position: relative;
-    z-index: -5;
-}
 
-path{
-    position: relative;
-    z-index: -10;
-}
 
-.piece{
-    position: relative;
-    z-index: 5; 
-}
 
 .theme1Light{
     background-color: var(--theme1Light-color);

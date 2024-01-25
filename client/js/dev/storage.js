@@ -5,11 +5,10 @@ export default class Storage{
     constructor(){
         this.playerId = parseInt(localStorage.playerId);
         this.api = new API();
-        const key = this.getAuth(); 
-        if(key){
-            this.socket = new Socket(key);
+        if(this.getAuth()){
+            this.socket = new Socket(this.getAuth());
         }
-    }   
+    }
 
     getAuth() {
         let auth = this.getCookie('key');

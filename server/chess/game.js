@@ -1,104 +1,33 @@
 import Validator from "./validator.js";
+import { Chess } from 'chess.js'
 
 class Game {
     constructor(gameId, idWhite, idBlack) {
         this.validator = new Validator();
-
-        this.gameId = gameId;
-        this.board = null;
-
         this.idWhite = idWhite;
         this.idBlack = idBlack;
 
-        this.colors = {}
-        this.colors[idWhite] = 'white';
-        this.colors[idBlack] = 'black';
+        this.gameId = gameId;
         
-        this.playerToMove = idWhite;
-        this.initializePieces();
-    }
-
-    initializePieces(){
-        this.pieces = {
-            rook: 'rook',
-            knight: 'knight',
-            bishop: 'bishop',
-            king: 'king',
-            queen: 'queen',
-            pawn: 'pawn'
-        };
-
-        this.board = [
-            [ 
-                {piece: this.pieces.rook, color: this.colors[this.idWhite]}, 
-                {piece: this.pieces.knight, color: this.colors[this.idWhite]}, 
-                {piece: this.pieces.bishop, color: this.colors[this.idWhite]}, 
-                {piece: this.pieces.king, color: this.colors[this.idWhite]}, 
-                {piece: this.pieces.queen, color: this.colors[this.idWhite]}, 
-                {piece: this.pieces.bishop, color: this.colors[this.idWhite]}, 
-                {piece: this.pieces.knight, color: this.colors[this.idWhite]}, 
-                {piece: this.pieces.rook, color: this.colors[this.idWhite]}
-            ],
-            [ 
-                {piece: this.pieces.pawn, color: this.colors[this.idWhite]}, 
-                {piece: this.pieces.pawn, color: this.colors[this.idWhite]}, 
-                {piece: this.pieces.pawn, color: this.colors[this.idWhite]}, 
-                {piece: this.pieces.pawn, color: this.colors[this.idWhite]}, 
-                {piece: this.pieces.pawn, color: this.colors[this.idWhite]}, 
-                {piece: this.pieces.pawn, color: this.colors[this.idWhite]}, 
-                {piece: this.pieces.pawn, color: this.colors[this.idWhite]}, 
-                {piece: this.pieces.pawn, color: this.colors[this.idWhite]}
-            ],
-            
-            [
-                {piece: '', color: ''}, {piece: '', color: ''}, {piece: '', color: ''}, {piece: '', color: ''}, 
-                {piece: '', color: ''}, {piece: '', color: ''}, {piece: '', color: ''}, {piece: '', color: ''}
-            ],
-            [
-                {piece: '', color: ''}, {piece: '', color: ''}, {piece: '', color: ''}, {piece: '', color: ''}, 
-                {piece: '', color: ''}, {piece: '', color: ''}, {piece: '', color: ''}, {piece: '', color: ''}
-            ],
-            [
-                {piece: '', color: ''}, {piece: '', color: ''}, {piece: '', color: ''}, {piece: '', color: ''}, 
-                {piece: '', color: ''}, {piece: '', color: ''}, {piece: '', color: ''}, {piece: '', color: ''}
-            ],
-            [
-                {piece: '', color: ''}, {piece: '', color: ''}, {piece: '', color: ''}, {piece: '', color: ''}, 
-                {piece: '', color: ''}, {piece: '', color: ''}, {piece: '', color: ''}, {piece: '', color: ''}
-            ],
-            [ 
-                {piece: this.pieces.pawn, color: this.colors[this.idBlack]}, 
-                {piece: this.pieces.pawn, color: this.colors[this.idBlack]}, 
-                {piece: this.pieces.pawn, color: this.colors[this.idBlack]}, 
-                {piece: this.pieces.pawn, color: this.colors[this.idBlack]}, 
-                {piece: this.pieces.pawn, color: this.colors[this.idBlack]}, 
-                {piece: this.pieces.pawn, color: this.colors[this.idBlack]}, 
-                {piece: this.pieces.pawn, color: this.colors[this.idBlack]}, 
-                {piece: this.pieces.pawn, color: this.colors[this.idBlack]}
-            ],
-            [ 
-                {piece: this.pieces.rook, color: this.colors[this.idBlack]}, 
-                {piece: this.pieces.knight, color: this.colors[this.idBlack]}, 
-                {piece: this.pieces.bishop, color: this.colors[this.idBlack]}, 
-                {piece: this.pieces.king, color: this.colors[this.idBlack]}, 
-                {piece: this.pieces.queen, color: this.colors[this.idBlack]}, 
-                {piece: this.pieces.bishop, color: this.colors[this.idBlack]}, 
-                {piece: this.pieces.knight, color: this.colors[this.idBlack]}, 
-                {piece: this.pieces.rook, color: this.colors[this.idBlack]}
-            ], 
-        ];
+        this.players = {};
+        this.players['w'] = idWhite;
+        this.players['b'] = idBlack;
+        
+        this.chess = new Chess();
+        this.fen = this.chess.fen();
     }
     
     move(positionFrom, positionTo, playerId){
-        if(!this.validator.checkMove(this, positionFrom, positionTo, playerId)){
+        if(this.players[this.chess.turn()] !== playerId){
             return false;
         }
-        this.playerToMove = playerId === this.idWhite ? this.idBlack : this.idWhite; 
-        this.board[positionTo[0]][positionTo[1]] = {
-            piece: this.board[positionFrom[0]][positionFrom[1]].piece, 
-            color: this.board[positionFrom[0]][positionFrom[1]].color
-        };
-        this.board[positionFrom[0]][positionFrom[1]] = {piece: '', color: ''};
+        try{
+            this.chess.move({from: positionFrom, to: positionTo});
+            this.fen = this.chess.fen();
+        }
+        catch(err){
+            return false;
+        }
         return true;
     }
 }

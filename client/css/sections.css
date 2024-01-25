@@ -1,9 +1,15 @@
+.details-section{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
 .game-section{
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    display: none;
 }
 
 #gameboard{

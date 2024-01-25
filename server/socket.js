@@ -1,6 +1,6 @@
 import { Server } from 'socket.io';
 
-class SocketConfig {
+class Socket {
     constructor(httpServer) {
         this.io = new Server(httpServer, {
             cors: {
@@ -9,10 +9,10 @@ class SocketConfig {
             }
         });
         this.socketsToEmailsDict = {};
-        this.configRequests();
+        this.manageRequests();
     }
 
-    configRequests(){
+    manageRequests(){
         this.io.on('connection', socket => {
             const key = socket.handshake.query['key'];
             if(!global.auth.checkKey(key)){
@@ -28,14 +28,20 @@ class SocketConfig {
                 socket.emit('send-game', game, this.socketsToEmailsDict[socket.id]);
             });
             socket.on('send-move', (positionFrom, positionTo) => {
-                let game = global.games.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);
-                if(!game.move(positionFrom, positionTo, this.socketsToEmailsDict[socket.id])){
-                    socket.emit('send-error');
-                    return;
+                try{
+                    let game = global.games.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);
+                    if(!game.move(positionFrom, positionTo, this.socketsToEmailsDict[socket.id])){
+                        socket.emit('send-error');
+                        return;
+                    }
+                    socket.emit('send-game', game);
+                    socket.to(game.idWhite).emit('send-game', game);
+                    socket.to(game.idBlack).emit('send-game', game);
                 }
-                socket.emit('send-game', game);
-                socket.to(game.idWhite).emit('send-game', game);
-                socket.to(game.idBlack).emit('send-game', game);
+                catch(err){
+                    console.log('Error caused by: ' + this.socketsToEmailsDict[socket.id]);
+                    console.log(err);
+                }
             });
             socket.on('check-game-in-progress', () => {
                 if(global.games.getGameByPlayerId(this.socketsToEmailsDict[socket.id])){
@@ -63,4 +69,4 @@ class SocketConfig {
     }
 }
 
-export default SocketConfig;
+export default Socket;
