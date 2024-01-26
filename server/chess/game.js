@@ -1,9 +1,7 @@
-import Validator from "./validator.js";
 import { Chess } from 'chess.js'
 
 class Game {
     constructor(gameId, idWhite, idBlack) {
-        this.validator = new Validator();
         this.idWhite = idWhite;
         this.idBlack = idBlack;
 

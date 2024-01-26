@@ -24,13 +24,6 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
         <!-- chess js -->
 
-        <!-- Bootstrap -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-        <!-- <link rel="stylesheet" href="bootstrap/bootstrap.min.css"> -->
-        <!-- <script src="bootstrap/bootstrap.bundle.min.js"></script> -->
-        <!-- Bootstrap -->
-
         <!-- socket.io   -->
         <script defer src="http://localhost:3000/socket.io/socket.io.js"></script>
         <!-- socket.io   -->
@@ -39,49 +32,45 @@
         <script src='js/dev/index.js' type="module"></script>
     </head>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="/">Board Games</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-              <ul class="navbar-nav">
-                <!-- <li class="nav-item active">
-                  <a class="nav-link" href="#">Home<span class="sr-only">(current)</span></a>
-                </li> -->
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Chess</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">Checkers</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="changeThemeButton" href="">Theme</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" id="revertBoardButton" href="">Revert board</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Profile</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" id="log-button" href="">Log in</a>
-                </li>
-              </ul>
+          <div class="nav">
+            <input type="checkbox" id="nav-check">
+            <div class="nav-header">
+              <div class="nav-title">
+                <a href="/">Board Games</a>
+              </div>
             </div>
-          </nav>
+            <div class="nav-btn">
+              <label for="nav-check">
+                <span></span>
+                <span></span>
+                <span></span>
+              </label>
+            </div>
+            
+            <div class="nav-links">
+              <a href="//github.io/jo_geek" target="_blank">Chess</a>
+              <a href="http://stackoverflow.com/users/4084003/" target="_blank">Checkers</a>
+              <a id="changeThemeButton" href="">Theme</a>
+              <a href="https://jsfiddle.net/user/jo_Geek/" target="_blank">Profile</a>
+              <a id="log-button" href="">Log in</a>
+
+            </div>
+          </div>
     </header>
     <body>
+      <div class="sections">
         <div class="details-section">
-          <label id="playerId">User ID</label>
-          <input id="createGameButton" type="button" value="Create game">
+          <p>Logged as <span id="playerId"></span></p>
           <p>Welcome to chess</p>
+          <input id="createGameButton" type="button" value="Create game">
         </div>
         <div class="game-section">
-          <label>Play for <span id="playFor"></span></label>
+          <p>You play for <span id="playFor"></span></p>
+          <button id="revertBoardButton">Revert board</button>
           <div id="gameboard"></div>
           <p id="info-display"></p>
         </div>
+      </div>
     </body>
     <footer></footer>
 </html>

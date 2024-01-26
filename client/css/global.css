@@ -1,16 +1,22 @@
 :root {
-	--theme1Light-color: #e3c16f;
-	--theme1Dark-color: #b88b4a;
-	--theme2Light-color: rgb(110, 110,98);
-	--theme2Dark-color: rgb(169, 43,43);
+	
+	--theme1Light-color: #f0d9b5;
+	--theme1Dark-color: #b58863;
+	--theme2Light-color: #e3c16f;
+	--theme2Dark-color: #b88b4a;
+	--theme3Light-color: rgb(110, 110,98);
+	--theme3Dark-color: rgb(169, 43,43);
 }
 
+
+* {
+	box-sizing: border-box;
+}
+  
 body {
 	padding: 0;
 	margin: 0;
-	display: flex;
-	justify-content: center;
-	flex-direction: column;
 }
+
 
 

@@ -1,6 +1,6 @@
 export default class API{
     constructor(){
-        this.serverURL = 'http://127.0.0.1:3000';
+        this.serverURL = 'http://192.168.168.100:3000';
     }
 
     async POSTRequest(url, body = null) {

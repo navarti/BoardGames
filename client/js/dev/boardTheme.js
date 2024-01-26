@@ -7,12 +7,22 @@ export default class BoardTheme{
         
         this.boardThemes = [
             {
-                light: 'theme1Light',
-                dark: 'theme1Dark',
+                light: getComputedStyle(document.documentElement)
+                    .getPropertyValue('--theme1Light-color'),
+                dark: getComputedStyle(document.documentElement)
+                .getPropertyValue('--theme1Dark-color'),
             },
             {
-                light: 'theme2Light',
-                dark: 'theme2Dark',
+                light: getComputedStyle(document.documentElement)
+                    .getPropertyValue('--theme2Light-color'),
+                dark: getComputedStyle(document.documentElement)
+                .getPropertyValue('--theme2Dark-color'),
+            },
+            {
+                light: getComputedStyle(document.documentElement)
+                    .getPropertyValue('--theme3Light-color'),
+                dark: getComputedStyle(document.documentElement)
+                .getPropertyValue('--theme3Dark-color'),
             },
         ];
 

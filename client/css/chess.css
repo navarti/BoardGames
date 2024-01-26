@@ -1,23 +1,4 @@
 
-
-
-
-.theme1Light{
-    background-color: var(--theme1Light-color);
-}
-
-.theme1Dark{
-    background-color: var(--theme1Dark-color);
-}
-
-.theme2Light{
-    background-color: var(--theme2Light-color);
-}
-
-.theme2Dark {
-    background-color: var(--theme2Dark-color);
-}
-
 .black{
     fill: black
 }

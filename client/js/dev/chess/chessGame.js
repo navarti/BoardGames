@@ -11,13 +11,16 @@ export default class ChessGame{
         //     e.preventDefault();
         //     this.changeBoardTheme(null);
         //     this.drawBoard();
-        // }    
+        // }
+        
+        document.querySelector('#revertBoardButton').onclick = () => {
+            this.forWhite = !this.forWhite;
+            this.drawGame();
+        }
 
         this.playFor = document.querySelector('#playFor')
         this.infoDisplay = document.querySelector('#info-display')
         
-        this.playFor.innerHTML = 'white';
-        this.infoDisplay.innerHTML = '';
         
         this.gameBoardName = 'gameboard';
         this.gameBoard = Chessboard(this.gameBoardName, {
@@ -25,15 +28,12 @@ export default class ChessGame{
             dropOffBoard: 'trash',
             sparePieces: true
         });
+        this.adjustStyleForBoardTheme();
     }
 
     drawGame(){
-        this.forWhite = this.gameInfo.idWhite === this.storage.socket.playerId;
         this.playFor.innerHTML = this.forWhite ?  'white' : 'black';
         this.infoDisplay.textContent = '';
-
-        // const whiteSquares = localStorage.lightSquares;
-        // const blackSquares = localStorage.darkSquares;
 
         function pieceTheme (piece) {
             if (piece.search(/w/) !== -1) {
@@ -98,6 +98,7 @@ export default class ChessGame{
 
         this.updateStatus();
         this.gameBoard = Chessboard(this.gameBoardName, config);
+        this.adjustStyleForBoardTheme();
     }
 
     updateStatus () {
@@ -133,6 +134,7 @@ export default class ChessGame{
         this.socket.on('send-game', (game) => {
             this.gameInfo = game;
             this.gameLogic = new Chess(game.fen); 
+            this.forWhite = this.gameInfo.idWhite === this.storage.socket.playerId;
             this.drawGame();
         });
 
@@ -155,6 +157,26 @@ export default class ChessGame{
 
     sendMove(){
         this.socket.emit('send-move', this.source, this.target);
+    }
+
+
+    adjustStyleForBoardTheme(){
+        const board = document.querySelector(`#${this.gameBoardName}`);
+        const allElements = board.querySelectorAll('*');
+
+        const whiteSquaresColor = localStorage.lightSquares;
+        const blackSquaresColor = localStorage.darkSquares;
+
+        allElements.forEach(element => {
+            element.classList.forEach(className => {
+                if(className.startsWith('white')){
+                    element.style.backgroundColor = whiteSquaresColor; 
+                }
+                if(className.startsWith('black')){
+                    element.style.backgroundColor = blackSquaresColor; 
+                }
+            });
+        });
     }
 }
 
