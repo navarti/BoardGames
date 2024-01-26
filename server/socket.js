@@ -27,16 +27,15 @@ class Socket {
                 const game = global.games.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);
                 socket.emit('send-game', game, this.socketsToEmailsDict[socket.id]);
             });
-            socket.on('send-move', (positionFrom, positionTo) => {
+            socket.on('send-move', (source, target) => {
                 try{
                     const game = global.games.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);
-                    if(!game.move(positionFrom, positionTo, this.socketsToEmailsDict[socket.id])){
+                    if(!game.move(source, target, this.socketsToEmailsDict[socket.id])){
                         socket.emit('send-error');
                         return;
                     }
-                    socket.emit('send-game', game);
-                    socket.to(game.idWhite).emit('send-game', game);
-                    socket.to(game.idBlack).emit('send-game', game);
+                    socket.to(game.chess.turn() === 'w' ? game.idWhite : game.idBlack).
+                        emit('send-move-from-server', source, target);
                 }
                 catch(err){
                     console.log('Error caused by: ' + this.socketsToEmailsDict[socket.id]);

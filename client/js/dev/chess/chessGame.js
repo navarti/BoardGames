@@ -1,5 +1,3 @@
-// import { Chess } from 'chess.js'
-
 export default class ChessGame{
     constructor(){
         this.storage = window.storage;
@@ -50,25 +48,34 @@ export default class ChessGame{
             if (this.gameLogic.game_over()) return false
           
             // only pick up pieces for the side to move
-            if ((this.gameLogic.turn() === 'w' && piece.search(/^b/) !== -1) ||
-                (this.gameLogic.turn() === 'b' && piece.search(/^w/) !== -1)) {
-              return false
-            }
+            // if ((this.gameLogic.turn() === 'w' && piece.search(/^b/) !== -1) ||
+            //     (this.gameLogic.turn() === 'b' && piece.search(/^w/) !== -1)) {
+            //   return false
+            // }
         }
         const bindedOnDragStart = onDragStart.bind(this);
 
         function onDrop (source, target) {
             // see if the move is legal
-            var move = this.gameLogic.move({
+            if((this.forWhite && this.gameLogic.turn() !== 'w')
+                || (!this.forWhite && this.gameLogic.turn() === 'w')){
+                return false;
+            }
+
+            const move = this.gameLogic.move({
               from: source,
               to: target,
               promotion: 'q' // NOTE: always promote to a queen for example simplicity
             })
           
             // illegal move
-            if (move === null) return 'snapback'
+            if (move === null) return 'snapback';
             
-            bindedUpdateStatus();
+            this.source = source;
+            this.target = target;
+            // this.promotion = 'q';
+            this.sendMove();
+            this.updateStatus();
         }
         const bindedOnDrop = onDrop.bind(this);
           
@@ -79,34 +86,6 @@ export default class ChessGame{
         }
         const bindedOnSnapEnd = onSnapEnd.bind(this);
           
-        function updateStatus () {
-            var status = ''
-            
-            const moveColor = this.gameLogic.turn() === 'w' ? 'White' : 'Black';
-            
-            // checkmate?
-            if (this.gameLogic.in_checkmate()) {
-                status = 'Game over, ' + moveColor + ' is in checkmate.'
-            }
-            
-            // draw?
-            else if (this.gameLogic.in_draw()) {
-                status = 'Game over, drawn position'
-            }
-            
-            // game still on
-            else {
-                status = moveColor + ' to move'
-            
-                // check?
-                if (this.gameLogic.in_check()) {
-                status += ', ' + moveColor + ' is in check'
-                }
-            }
-            this.infoDisplay.textContent = status;
-        }
-        const bindedUpdateStatus = updateStatus.bind(this);
-
         const config = {
             draggable: true,
             pieceTheme: pieceTheme,
@@ -117,8 +96,35 @@ export default class ChessGame{
             onSnapEnd: bindedOnSnapEnd
         }
 
-        bindedUpdateStatus();
+        this.updateStatus();
         this.gameBoard = Chessboard(this.gameBoardName, config);
+    }
+
+    updateStatus () {
+        var status = ''
+        
+        const moveColor = this.gameLogic.turn() === 'w' ? 'White' : 'Black';
+        
+        // checkmate?
+        if (this.gameLogic.in_checkmate()) {
+            status = 'Game over, ' + moveColor + ' is in checkmate.'
+        }
+        
+        // draw?
+        else if (this.gameLogic.in_draw()) {
+            status = 'Game over, drawn position'
+        }
+        
+        // game still on
+        else {
+            status = moveColor + ' to move'
+        
+            // check?
+            if (this.gameLogic.in_check()) {
+            status += ', ' + moveColor + ' is in check'
+            }
+        }
+        this.infoDisplay.textContent = status;
     }
 
     socketInit(){
@@ -130,6 +136,16 @@ export default class ChessGame{
             this.drawGame();
         });
 
+        this.socket.on('send-move-from-server', (source, target) => {
+            this.gameBoard.move(`${source}-${target}`);
+            this.gameLogic.move({
+                from: source,
+                to: target,
+                promotion: 'q' // NOTE: always promote to a queen for example simplicity
+            });
+            this.updateStatus();
+        });
+
         this.socket.on('send-error', () => {
             this.infoDisplay.textContent = 'Illegal move';    
         });
@@ -137,11 +153,8 @@ export default class ChessGame{
         this.socket.emit('get-game');
     }
 
-
-
-
     sendMove(){
-        //this.socket.emit('send-move', this.positionFrom, this.positionTo);
+        this.socket.emit('send-move', this.source, this.target);
     }
 }
 

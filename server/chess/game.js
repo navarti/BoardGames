@@ -17,17 +17,18 @@ class Game {
         this.fen = this.chess.fen();
     }
     
-    move(positionFrom, positionTo, playerId){
+    move(source, target, playerId){
         if(this.players[this.chess.turn()] !== playerId){
             return false;
         }
-        try{
-            this.chess.move({from: positionFrom, to: positionTo});
-            this.fen = this.chess.fen();
-        }
-        catch(err){
-            return false;
-        }
+        const move = this.chess.move({
+            from: source,
+            to: target,
+            promotion: 'q' // NOTE: always promote to a queen for example simplicity
+        });
+        // illegal move
+        if (move === null) return false;
+        this.fen = this.chess.fen();        
         return true;
     }
 }
