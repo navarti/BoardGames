@@ -5,6 +5,8 @@ class Game {
         this.idWhite = idWhite;
         this.idBlack = idBlack;
 
+        this.lastMove = null;
+        this.secondLastMove = null;
         this.gameId = gameId;
         
         this.players = {};
@@ -19,6 +21,7 @@ class Game {
         if(this.players[this.chess.turn()] !== playerId){
             return false;
         }
+        const color = this.chess.turn();
         const move = this.chess.move({
             from: source,
             to: target,
@@ -26,6 +29,12 @@ class Game {
         });
         // illegal move
         if (move === null) return false;
+        this.secondLastMove = this.lastMove;
+        this.lastMove = {
+            color: color,
+            source: source,
+            target: target
+        };
         this.fen = this.chess.fen();        
         return true;
     }

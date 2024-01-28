@@ -1,3 +1,9 @@
+.highlight-white {
+    box-shadow: inset 0 0 3px 3px yellow;
+}
+.highlight-black {
+    box-shadow: inset 0 0 3px 3px blue;
+}
 
 .black{
     fill: black

@@ -31,22 +31,94 @@ export default class ChessGame{
         this.adjustStyleForBoardTheme();
     }
 
+    removeHighlights (color) {
+        const squareClass = 'square-55d63';
+        $(`#${this.gameBoardName}`).find('.' + squareClass).removeClass('highlight-' + color);
+    }
+
+    addHighlights (color, source, target){
+        $(`#${this.gameBoardName}`).find('.square-' + source).addClass('highlight-' + color);
+        $(`#${this.gameBoardName}`).find('.square-' + target).addClass('highlight-' + color);
+    }
+
     drawGame(){
-        this.playFor.innerHTML = this.forWhite ?  'white' : 'black';
         this.infoDisplay.textContent = '';
+        this.playFor.innerHTML = this.playerColorWhite ?  'white' : 'black';
 
         function pieceTheme (piece) {
             if (piece.search(/w/) !== -1) {
-              return 'img/chesspieces/wikipedia/' + piece + '.png'
+              return 'img/chesspieces/wikipedia/' + piece + '.png';
             }
           
-            return 'img/chesspieces/wikipedia/' + piece + '.png'
+            return 'img/chesspieces/wikipedia/' + piece + '.png';
         }
+
+        function removeGreySquares () {
+            $(`#${this.gameBoardName} .square-55d63`).css('background', '');
+        }
+        const bindedRemoveGreySquares = removeGreySquares.bind(this);
+    
+        function greySquare (square) {
+            const whiteSquareGrey = '#a9a9a9';
+            const blackSquareGrey = '#696969';
+            const $square = $(`#${this.gameBoardName} .square-` + square);
+
+            let background = whiteSquareGrey;
+            if ($square.hasClass('black-3c85d')) {
+                background = blackSquareGrey;
+            }
+            
+            $square.css('background', background);
+        }
+        const bindedGreySquare = greySquare.bind(this);
+
+        function onMouseoverSquare (square, piece) {
+            // get list of possible moves for this square
+            var moves = this.gameLogic.moves({
+                square: square,
+                verbose: true
+            });
+          
+            // exit if there are no moves available for this square
+            if (moves.length === 0) return;
+          
+            // highlight the square they moused over
+            bindedGreySquare(square);
+          
+            // highlight the possible squares for this piece
+            for (var i = 0; i < moves.length; i++) {
+                bindedGreySquare(moves[i].to);
+            }
+        }
+        const bindedOnMouseoverSquare = onMouseoverSquare.bind(this);
+          
+        function onMouseoutSquare (square, piece) {
+            bindedRemoveGreySquares();
+        }
+        const bindedOnMouseoutSquare = onMouseoutSquare.bind(this);
+
 
         function onDragStart (source, piece, position, orientation) {
             // do not pick up pieces if the game is over
-            if (this.gameLogic.game_over()) return false
+            if (this.gameLogic.game_over()) return false;
+            this.activePosition = position;  
+            // get list of possible moves for this square
+            var moves = this.gameLogic.moves({
+                square: position,
+                verbose: true
+            });
           
+            // exit if there are no moves available for this square
+            if (moves.length === 0) return;
+          
+            // highlight the square they moused over
+            bindedGreySquare(square);
+          
+            // highlight the possible squares for this piece
+            for (var i = 0; i < moves.length; i++) {
+                bindedGreySquare(moves[i].to);
+            }
+
             // only pick up pieces for the side to move
             // if ((this.gameLogic.turn() === 'w' && piece.search(/^b/) !== -1) ||
             //     (this.gameLogic.turn() === 'b' && piece.search(/^w/) !== -1)) {
@@ -57,8 +129,8 @@ export default class ChessGame{
 
         function onDrop (source, target) {
             // see if the move is legal
-            if((this.forWhite && this.gameLogic.turn() !== 'w')
-                || (!this.forWhite && this.gameLogic.turn() === 'w')){
+            if((this.playerColorWhite && this.gameLogic.turn() !== 'w')
+                || (!this.playerColorWhite && this.gameLogic.turn() === 'w')){
                 return false;
             }
 
@@ -76,6 +148,8 @@ export default class ChessGame{
             // this.promotion = 'q';
             this.sendMove();
             this.updateStatus();
+            this.removeHighlights(this.playerColorWhite ? 'white' : 'black');
+            this.addHighlights(this.playerColorWhite ? 'white' : 'black', source, target);
         }
         const bindedOnDrop = onDrop.bind(this);
           
@@ -93,12 +167,21 @@ export default class ChessGame{
             orientation: this.forWhite ? 'white' : 'black',
             onDragStart: bindedOnDragStart,
             onDrop: bindedOnDrop,
+            onMouseoutSquare: bindedOnMouseoutSquare,
+            onMouseoverSquare: bindedOnMouseoverSquare,
+            //onMoveEnd: bindedOnMoveEnd,
             onSnapEnd: bindedOnSnapEnd
         }
 
         this.updateStatus();
         this.gameBoard = Chessboard(this.gameBoardName, config);
         this.adjustStyleForBoardTheme();
+        if(this.gameInfo.lastMove){
+            this.addHighlights(this.gameInfo.lastMove.color === 'w' ? 'white' : 'black', this.gameInfo.lastMove.source, this.gameInfo.lastMove.target);
+        }        
+        if(this.gameInfo.secondLastMove){
+            this.addHighlights(this.gameInfo.secondLastMove.color === 'w' ? 'white' : 'black', this.gameInfo.secondLastMove.source, this.gameInfo.secondLastMove.target);
+        }
     }
 
     updateStatus () {
@@ -134,7 +217,8 @@ export default class ChessGame{
         this.socket.on('send-game', (game) => {
             this.gameInfo = game;
             this.gameLogic = new Chess(game.fen); 
-            this.forWhite = this.gameInfo.idWhite === this.storage.socket.playerId;
+            this.playerColorWhite = this.gameInfo.idWhite === this.storage.socket.playerId;
+            this.forWhite = this.playerColorWhite;
             this.drawGame();
         });
 
@@ -145,6 +229,8 @@ export default class ChessGame{
                 to: target,
                 promotion: 'q' // NOTE: always promote to a queen for example simplicity
             });
+            this.removeHighlights(this.playerColorWhite ? 'black' : 'white');
+            this.addHighlights(this.playerColorWhite ? 'black' : 'white', source, target);
             this.updateStatus();
         });
 
@@ -158,7 +244,6 @@ export default class ChessGame{
     sendMove(){
         this.socket.emit('send-move', this.source, this.target);
     }
-
 
     adjustStyleForBoardTheme(){
         const board = document.querySelector(`#${this.gameBoardName}`);
