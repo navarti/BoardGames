@@ -12,9 +12,17 @@ export default class App {
 
         this.chess = new ChessGame();
 
-        if(this.auth.check()){
-            this.socketInit();        
+        if(!this.auth.check()){
+            this.bindButtonsWithoutSocket();
+            return;
         }
+        this.socketInit();        
+    }
+
+    bindButtonsWithoutSocket(){
+        document.querySelector('#createGameButton').onclick = () => {
+            alert('Log in to play chess');
+        };
     }
 
     socketInit(){
@@ -24,10 +32,10 @@ export default class App {
         });
 
         this.socket.emit('check-game-in-progress');
-        this.bindButtons();
+        this.bindButtonsWithSocket();
     }
 
-    bindButtons(){
+    bindButtonsWithSocket(){
         document.querySelector('#createGameButton').onclick = () => {
             this.socket.emit('create-game');
         };
