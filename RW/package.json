@@ -1,0 +1,12 @@
+{
+  "name": "rw",
+  "version": "1.0.0",
+  "description": "",
+  "main": "RW.js",
+  "type": "module",
+  "scripts": {
+    "start": "node ."
+  },
+  "author": "navarti",
+  "license": "ISC"
+}
