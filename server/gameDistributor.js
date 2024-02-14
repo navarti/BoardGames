@@ -1,4 +1,4 @@
-import Game from "./chess/game.js";
+import ChessGame from "./games/chessGame.js";
 
 class GameDistributor {
     constructor() {
@@ -32,7 +32,7 @@ class GameDistributor {
 
     addGame(idWhite, idBlack){
         const gameId = this.counterGameId++;
-        const game = new Game(gameId, idWhite, idBlack);
+        const game = new ChessGame(gameId, idWhite, idBlack);
         this.gameList.push(game);
         if(this.counterGameId === 1000000){
             this.counterGameId = 1;

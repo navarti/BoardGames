@@ -1,4 +1,4 @@
-import ChessGame from './chess/chessGame.js';
+import ChessGame from './games/chessGame.js';
 import Storage from './storage.js';
 import Auth from './auth.js';
 import BoardTheme from './boardTheme.js';

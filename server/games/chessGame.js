@@ -1,6 +1,6 @@
 import { Chess } from 'chess.js';
 
-class Game {
+class ChessGame {
     constructor(gameId, idWhite, idBlack) {
         this.idWhite = idWhite;
         this.idBlack = idBlack;
@@ -40,4 +40,4 @@ class Game {
     }
 }
 
-export default Game;
+export default ChessGame;
