@@ -1,7 +1,3 @@
-exports.printMsg = function() {
-    console.log("Rabbit and Wolfs is required here");
-}
-
 export default class RabbitWolfs {
     constructor(){
         this.rabbit = 'w';
