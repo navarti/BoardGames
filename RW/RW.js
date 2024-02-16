@@ -1,15 +1,54 @@
 export default class RabbitWolfs {
-    constructor(){
+    constructor(fen=null){
         this.rabbit = 'w';
         this.wolf = 'b';
 
-        this.initBoard();
+        if(!fen){
+            this.initNewBoard();
+            return;
+        }   
+        this.initBoardWithFen(fen);
     }
 
-    initBoard(){
+    initNewBoard(){
         this.rabbitPos = {row: 1, col: 5};
         this.wolfPos = [{row: 8, col: 2}, {row: 8, col: 4}, {row: 8, col: 6}, {row: 8, col: 8}];
         this.turnOf = this.rabbit;
+    }
+
+    initBoardWithFen(fen) {
+        const fenParts = fen.split(' ');
+        const board = fenParts[0];
+        const playerToMove = fenParts[1];
+        
+        let row = 8;
+        let col = 1;
+        const blackPawns = [];
+        let whitePawn;
+    
+        for (const char of board) {
+            if (char === '/') {
+                row--;
+                col = 1;
+            } else if (char === 'p') {
+                blackPawns.push({ row, col });
+                col++;
+            } else if (char === 'P') {
+                whitePawn = { row, col };
+                col++;
+            } else if (!isNaN(parseInt(char))) {
+                col += parseInt(char);
+            }
+        }
+    
+        // Assuming black has 4 pawns, if there are fewer, we can pad with arbitrary positions
+        while (blackPawns.length < 4) {
+            blackPawns.push({ row: 1, col: 1 });
+        }
+        
+        this.rabbitPos = whitePawn;
+        this.wolfPos = blackPawns;
+        this.turnOf = playerToMove;
     }
 
     move(source, target) {
@@ -97,7 +136,7 @@ export default class RabbitWolfs {
         return this.turnOf;
     }
 
-    isGameOver() {
+    game_over() {
         if(this.rabbitPos.row == 8){
             this.winner = this.rabbit;
             return true;
@@ -150,9 +189,9 @@ export default class RabbitWolfs {
     }
 
     listOfLegalMovesRabbit(){
-        res = [];
-        for(let i=this.rabbitPos.row-1; i<this.rabbitPos.row+1; i++){
-            for(let j=this.rabbitPos.col - 1; j<this.rabbitPos.col+1; j++){
+        const res = [];
+        for(let i=this.rabbitPos.row-1; i<=this.rabbitPos.row+1; i++){
+            for(let j=this.rabbitPos.col - 1; j<=this.rabbitPos.col+1; j++){
                 if(this.isLegalMoveRabbit(this.rabbitPos, {row: i, col: j})){
                     res.push({row: i, col: j});
                 }
@@ -162,9 +201,9 @@ export default class RabbitWolfs {
     }
 
     listOfLegalMovesWolf(){
-        res = [];
+        const res = [];
         this.wolfPos.forEach((wolfP) => {
-            for(let j=wolfP.col - 1; j<wolfP.col+1; j++){
+            for(let j=wolfP.col - 1; j<=wolfP.col+1; j++){
                 if(this.isLegalMoveRabbit(wolfP, {row: wolfP.row+1, col: j})){
                     res.push({row: i, col: j});
                 }

@@ -1,4 +1,5 @@
 import ChessGame from "./games/chessGame.js";
+import RWGame from "./games/rwGame.js";
 
 class GameDistributor {
     constructor() {
@@ -15,7 +16,7 @@ class GameDistributor {
     }
 
     //return players obj if game created, null if added a player to a queue  
-    onCreateGame(playerId) {
+    onCreateChessGame(playerId) {
         if(this.playersInQueue.length === 0){
             this.playersInQueue.push(playerId);
             return null;
@@ -23,16 +24,43 @@ class GameDistributor {
         const opponentId = this.playersInQueue[0];
         this.playersInQueue.splice(0, 1);
         
-        this.addGame(playerId, opponentId);
+        this.addChessGame(playerId, opponentId);
         return {
             player1: playerId, 
             player2: opponentId
         };
     }
 
-    addGame(idWhite, idBlack){
+    addChessGame(idWhite, idBlack){
         const gameId = this.counterGameId++;
         const game = new ChessGame(gameId, idWhite, idBlack);
+        this.gameList.push(game);
+        if(this.counterGameId === 1000000){
+            this.counterGameId = 1;
+        }
+        this.playersToGamesDict[idWhite] = game;
+        this.playersToGamesDict[idBlack] = game;
+    }
+
+    //return players obj if game created, null if added a player to a queue  
+    onCreateRWGame(playerId) {
+        if(this.playersInQueue.length === 0){
+            this.playersInQueue.push(playerId);
+            return null;
+        }
+        const opponentId = this.playersInQueue[0];
+        this.playersInQueue.splice(0, 1);
+        
+        this.addRWGame(playerId, opponentId);
+        return {
+            player1: playerId, 
+            player2: opponentId
+        };
+    }
+
+    addRWGame(idWhite, idBlack){
+        const gameId = this.counterGameId++;
+        const game = new RWGame(gameId, idWhite, idBlack);
         this.gameList.push(game);
         if(this.counterGameId === 1000000){
             this.counterGameId = 1;

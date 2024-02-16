@@ -10,6 +10,17 @@ export default class Storage{
         }
     }
 
+    getTypeOfGame(){
+        if(!localStorage.gameType){
+            localStorage.gameType = "chess";
+        }
+        return localStorage.gameType;
+    }
+
+    setTypeOfGame(type){
+        localStorage.gameType = type;
+    }
+
     getAuth() {
         let auth = this.getCookie('key');
         if(auth) return auth;

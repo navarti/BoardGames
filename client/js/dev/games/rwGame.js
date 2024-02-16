@@ -1,7 +1,7 @@
-export default class ChessGame{
-    constructor(){
-        this.storage = window.storage;
-        
+import RabbitandWolfs from '../../node_modules/@navarti/rw/RW.js';
+
+export default class RWGame{
+    constructor(){        
         this.init();
     }
 
@@ -58,35 +58,7 @@ export default class ChessGame{
             return 'img/chesspieces/wikipedia/' + piece + '.png';
         }
 
-        function removeGreySquares () {
-            $(`#${this.gameBoardName} .square-55d63`).css('background', '');
-        }
-        const bindedRemoveGreySquares = removeGreySquares.bind(this);
-    
-        function greySquare (square) {
-            const whiteSquareGrey = '#a9a9a9';
-            const blackSquareGrey = '#696969';
-            const $square = $(`#${this.gameBoardName} .square-` + square);
-
-            let background = whiteSquareGrey;
-            if ($square.hasClass('black-3c85d')) {
-                background = blackSquareGrey;
-            }
-            
-            $square.css('background', background);
-        }
-        const bindedGreySquare = greySquare.bind(this);
-
         function onDragStart (source, piece, position, orientation) {
-            if(this.activePosition === source){
-                return;
-            }
-            bindedRemoveGreySquares();
-            if(this.activePosition){
-                if(this.sendMove(this.activePosition, source)){
-                    return;
-                }
-            }
             if(piece === ''){
                 return;
             }
@@ -101,23 +73,6 @@ export default class ChessGame{
                 || (this.gameLogic.turn() === 'b' && piece.search(/^w/) !== -1)) {
                 return false
             }
-            this.activePosition = source;  
-            // get list of possible moves for this square
-            var moves = this.gameLogic.moves({
-                square: source,
-                verbose: true
-            });
-          
-            // exit if there are no moves available for this square
-            if (moves.length === 0) return;
-          
-            // highlight the square they moused over
-            bindedGreySquare(source);
-          
-            // highlight the possible squares for this piece
-            for (var i = 0; i < moves.length; i++) {
-                bindedGreySquare(moves[i].to);
-            }
         }
         const bindedOnDragStart = onDragStart.bind(this);
 
@@ -125,7 +80,6 @@ export default class ChessGame{
             if(!this.sendMove(source, target)){
                 return 'snapback';
             }
-            bindedRemoveGreySquares();
         }
         const bindedOnDrop = onDrop.bind(this);
           
@@ -181,50 +135,36 @@ export default class ChessGame{
     }
 
     updateStatus () {
-        var status = ''
+        var status = '';
         
         const moveColor = this.gameLogic.turn() === 'w' ? 'White' : 'Black';
         
         // checkmate?
-        if (this.gameLogic.in_checkmate()) {
-            status = 'Game over, ' + moveColor + ' is in checkmate.'
-        }
-        
-        // draw?
-        else if (this.gameLogic.in_draw()) {
-            status = 'Game over, drawn position'
+        if (this.gameLogic.game_over()) {
+            status = 'Game over, ' + moveColor + ' is in checkmate.';
         }
         
         // game still on
         else {
-            status = moveColor + ' to move'
-        
-            // check?
-            if (this.gameLogic.in_check()) {
-            status += ', ' + moveColor + ' is in check'
-            }
+            status = moveColor + ' to move';
         }
         this.infoDisplay.textContent = status;
     }
 
     socketInit(){
-        this.socket = this.storage.socket.socket;
+        this.socket = window.storage.socket.socket;
         //socket requests
         this.socket.on('send-game', (game) => {
             this.gameInfo = game;
-            this.gameLogic = new Chess(game.fen); 
-            this.playerColorWhite = this.gameInfo.idWhite === this.storage.socket.playerId;
+            this.gameLogic = new RabbitandWolfs(game.fen); 
+            this.playerColorWhite = this.gameInfo.idWhite === window.storage.socket.playerId;
             this.forWhite = this.playerColorWhite;
             this.drawGame();
         });
 
         this.socket.on('send-move-from-server', (source, target) => {
             this.gameBoard.move(`${source}-${target}`);
-            this.gameLogic.move({
-                from: source,
-                to: target,
-                promotion: 'q' // NOTE: always promote to a queen for example simplicity
-            });
+            this.gameLogic.move(source, target);
             this.removeHighlights(this.playerColorWhite ? 'black' : 'white');
             this.addHighlights(this.playerColorWhite ? 'black' : 'white', source, target);
             this.updateStatus();
@@ -239,22 +179,17 @@ export default class ChessGame{
 
     sendMove(source, target){
         // see if the move is legal
-        const move = this.gameLogic.move({
-            from: source,
-            to: target,
-            promotion: 'q' // NOTE: always promote to a queen for example simplicity
-        })
+        const move = this.gameLogic.move(source, target);
         
         // illegal move
         if (move === null) return false;
         
-        // this.promotion = 'q';
         this.updateStatus();
         this.removeHighlights(this.playerColorWhite ? 'white' : 'black');
         this.addHighlights(this.playerColorWhite ? 'white' : 'black', source, target);
         this.gameBoard.move(`${source}-${target}`);
         this.activePosition = null;
-        this.socket.emit('send-chess-move', source, target);
+        this.socket.emit('send-rw-move', source, target);
         return true;
     }
 
@@ -264,17 +199,6 @@ export default class ChessGame{
 
         const whiteSquaresColor = localStorage.lightSquares;
         const blackSquaresColor = localStorage.darkSquares;
-
-        // allElements.forEach(element => {
-        //     element.classList.forEach(className => {
-        //         if(className.startsWith('white')){
-        //             element.style.backgroundColor = whiteSquaresColor; 
-        //         }
-        //         if(className.startsWith('black')){
-        //             element.style.backgroundColor = blackSquaresColor; 
-        //         }
-        //     });
-        // });
 
         for(let i=0; i<allElements.length; i++){
             for(let j=0; j<allElements[i].classList.length;j++){

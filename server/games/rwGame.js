@@ -1,8 +1,8 @@
-import { Chess } from 'chess.js';
+import RabbitWolfs from '@navarti/rw';
 
-class ChessGame {
+class RWGame {
     constructor(gameId, idWhite, idBlack) {
-        this.type = "chess";
+        this.type = "rw";
         
         this.idWhite = idWhite;
         this.idBlack = idBlack;
@@ -15,20 +15,16 @@ class ChessGame {
         this.players['w'] = idWhite;
         this.players['b'] = idBlack;
         
-        this.chess = new Chess();
-        this.fen = this.chess.fen();
+        this.rw = new RabbitWolfs();
+        this.fen = this.rw.fen();
     }
     
     move(source, target, playerId){
-        if(this.players[this.chess.turn()] !== playerId){
+        if(this.players[this.rw.turn()] !== playerId){
             return false;
         }
-        const color = this.chess.turn();
-        const move = this.chess.move({
-            from: source,
-            to: target,
-            promotion: 'q' // NOTE: always promote to a queen for example simplicity
-        });
+        const color = this.rw.turn();
+        const move = this.rw.move(source, target);
         // illegal move
         if (move === null) return false;
         this.secondLastMove = this.lastMove;
@@ -37,9 +33,9 @@ class ChessGame {
             source: source,
             target: target
         };
-        this.fen = this.chess.fen();        
+        this.fen = this.rw.fen();        
         return true;
     }
 }
 
-export default ChessGame;
+export default RWGame;

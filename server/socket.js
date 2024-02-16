@@ -27,7 +27,25 @@ class Socket {
                 const game = global.gameDistributor.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);
                 socket.emit('send-game', game, this.socketsToEmailsDict[socket.id]);
             });
-            socket.on('send-move', (source, target) => {
+            socket.on('send-rw-move', (source, target) => {
+                try{
+                    const game = global.gameDistributor.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);
+                    if(!game.move(source, target, this.socketsToEmailsDict[socket.id])){
+                        socket.emit('send-error');
+                        return;
+                    }
+                    if(game.rw.game_over()){
+                        global.gameDistributor.onDisposeGame(this.socketsToEmailsDict[socket.id], game.rw.fen());
+                    }
+                    socket.to(game.rw.turn() === 'w' ? game.idWhite : game.idBlack).
+                        emit('send-move-from-server', source, target);
+                }
+                catch(err){
+                    console.log('Error caused by: ' + this.socketsToEmailsDict[socket.id]);
+                    console.log(err);
+                }
+            });
+            socket.on('send-chess-move', (source, target) => {
                 try{
                     const game = global.gameDistributor.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);
                     if(!game.move(source, target, this.socketsToEmailsDict[socket.id])){
@@ -51,12 +69,25 @@ class Socket {
                     return;
                 }
             });
-            socket.on('create-game', () => {
+            socket.on('create-chess-game', () => {
                 if(!global.gameDistributor.onCanCreateGame(this.socketsToEmailsDict[socket.id])){
                     socket.emit('send-alert', 'You have game in progress');
                     return;
                 }
-                const players = global.gameDistributor.onCreateGame(this.socketsToEmailsDict[socket.id]); 
+                const players = global.gameDistributor.onCreateChessGame(this.socketsToEmailsDict[socket.id]); 
+                if(!players){
+                    return;
+                }
+                socket.emit('game-ready');
+                socket.to(players.player1).emit('game-ready');
+                socket.to(players.player2).emit('game-ready');
+            });
+            socket.on('create-rw-game', () => {
+                if(!global.gameDistributor.onCanCreateGame(this.socketsToEmailsDict[socket.id])){
+                    socket.emit('send-alert', 'You have game in progress');
+                    return;
+                }
+                const players = global.gameDistributor.onCreateRWGame(this.socketsToEmailsDict[socket.id]); 
                 if(!players){
                     return;
                 }
