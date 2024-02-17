@@ -74,6 +74,13 @@ class GameDistributor {
         return game;
     }
 
+    onSurrender(playerId, fenString){
+        const game = this.playersToGamesDict[playerId];
+        
+
+        this.onDisposeGame();
+    }
+
     onDisposeGame(playerId, fenString){
         const game = this.playersToGamesDict[playerId];
         this.gameStorage.push({

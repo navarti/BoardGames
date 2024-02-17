@@ -3,6 +3,9 @@ import API from './API.js';
 
 export default class Storage{
     constructor(){
+        this.chessName = "chess";
+        this.rwName = "rw";
+
         this.playerId = parseInt(localStorage.playerId);
         this.api = new API();
         if(this.getAuth()){
@@ -12,7 +15,7 @@ export default class Storage{
 
     getTypeOfGame(){
         if(!localStorage.gameType){
-            localStorage.gameType = "chess";
+            localStorage.gameType = this.chessName;
         }
         return localStorage.gameType;
     }

@@ -14,7 +14,7 @@ class ChessGame {
         this.players = {};
         this.players['w'] = idWhite;
         this.players['b'] = idBlack;
-        
+
         this.chess = new Chess();
         this.fen = this.chess.fen();
     }

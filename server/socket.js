@@ -69,6 +69,10 @@ class Socket {
                     return;
                 }
             });
+            socket.on('can-create-game', () => {
+                const canCreate = global.gameDistributor.onCanCreateGame(this.socketsToEmailsDict[socket.id]);
+                socket.emit('can-create-game-response', canCreate);
+            });
             socket.on('create-chess-game', () => {
                 if(!global.gameDistributor.onCanCreateGame(this.socketsToEmailsDict[socket.id])){
                     socket.emit('send-alert', 'You have game in progress');
