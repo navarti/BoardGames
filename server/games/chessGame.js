@@ -15,16 +15,18 @@ class ChessGame {
         this.players['w'] = idWhite;
         this.players['b'] = idBlack;
 
-        this.chess = new Chess();
-        this.fen = this.chess.fen();
+        this.surrendedBy = null;
+
+        this.engine = new Chess();
+        this.fen = this.engine.fen();
     }
     
     move(source, target, playerId){
-        if(this.players[this.chess.turn()] !== playerId){
+        if(this.players[this.engine.turn()] !== playerId){
             return false;
         }
-        const color = this.chess.turn();
-        const move = this.chess.move({
+        const color = this.engine.turn();
+        const move = this.engine.move({
             from: source,
             to: target,
             promotion: 'q' // NOTE: always promote to a queen for example simplicity
@@ -37,8 +39,13 @@ class ChessGame {
             source: source,
             target: target
         };
-        this.fen = this.chess.fen();        
+        this.fen = this.engine.fen();        
         return true;
+    }
+
+    //for using with rw which has another function with gameOver 
+    isGameOver(){
+        return this.engine.isGameOver();
     }
 }
 

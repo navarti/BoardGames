@@ -14,17 +14,19 @@ class RWGame {
         this.players = {};
         this.players['w'] = idWhite;
         this.players['b'] = idBlack;
+
+        this.surrendedBy = null;
         
-        this.rw = new RabbitWolfs();
-        this.fen = this.rw.fen();
+        this.engine = new RabbitWolfs();
+        this.fen = this.engine.fen();
     }
     
     move(source, target, playerId){
-        if(this.players[this.rw.turn()] !== playerId){
+        if(this.players[this.engine.turn()] !== playerId){
             return false;
         }
-        const color = this.rw.turn();
-        const move = this.rw.move(source, target);
+        const color = this.engine.turn();
+        const move = this.engine.move(source, target);
         // illegal move
         if (move === null) return false;
         this.secondLastMove = this.lastMove;
@@ -33,8 +35,13 @@ class RWGame {
             source: source,
             target: target
         };
-        this.fen = this.rw.fen();        
+        this.fen = this.engine.fen();        
         return true;
+    }
+
+    //for using with chess which has another method with gameOver
+    isGameOver(){
+        return this.engine.game_over();
     }
 }
 

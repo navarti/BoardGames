@@ -57,8 +57,7 @@ export default class App {
     bindButtonsFreeToSeek(){
         document.querySelector('#universalGameButton').value = 'Seek an opponent';
         document.querySelector('#universalGameButton').onclick = () => {
-            this.socket.emit(`create-${this.typeOfGame}-game`);
-            this.socket.emit('can-create-game');
+            this.socket.emit(`create-game`, this.typeOfGame);
         };
     }
 

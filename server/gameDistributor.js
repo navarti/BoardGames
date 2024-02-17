@@ -3,6 +3,9 @@ import RWGame from "./games/rwGame.js";
 
 class GameDistributor {
     constructor() {
+        this.chessName = 'chess';
+        this.rwName = 'rw';
+
         this.playersInQueue = [];
         this.counterGameId = 1;
         this.gameList = [];
@@ -12,23 +15,45 @@ class GameDistributor {
 
     onCanCreateGame(playerId){
         //check if player is not waiting for game already and not have game in progress
-        return !this.playersInQueue.includes(playerId) && !this.getGameByPlayerId(playerId);
+
+        let isInQueue = false;
+        for(let i=0; i<this.playersInQueue.length; i++){
+            if(this.playersInQueue[i].playerId === playerId){
+                isInQueue = true;
+            }
+        }
+        const a = this.getGameByPlayerId(playerId);
+        return !isInQueue && !this.getGameByPlayerId(playerId);
     }
 
     //return players obj if game created, null if added a player to a queue  
-    onCreateChessGame(playerId) {
-        if(this.playersInQueue.length === 0){
-            this.playersInQueue.push(playerId);
+    onCreate(playerId, gameType) {
+        if(gameType !== this.chessName 
+            && gameType !== this.rwName){
+            
             return null;
         }
-        const opponentId = this.playersInQueue[0];
-        this.playersInQueue.splice(0, 1);
-        
-        this.addChessGame(playerId, opponentId);
-        return {
-            player1: playerId, 
-            player2: opponentId
-        };
+
+        for(let i=0; i<this.playersInQueue.length; i++){
+            if(this.playersInQueue[i].gameType === gameType){
+                const opponentId = this.playersInQueue[i].playerId;
+                this.playersInQueue.splice(i, 1);
+                
+                if(gameType === this.chessName){
+                    this.addChessGame(playerId, opponentId);
+                }
+                else if(gameType === this.rwName){
+                    this.addRWGame(playerId, opponentId);
+                }
+
+                return {
+                    player1: playerId, 
+                    player2: opponentId
+                };
+            }
+        }
+        this.playersInQueue.push({playerId: playerId, gameType: gameType});
+        return null;
     }
 
     addChessGame(idWhite, idBlack){
@@ -40,22 +65,6 @@ class GameDistributor {
         }
         this.playersToGamesDict[idWhite] = game;
         this.playersToGamesDict[idBlack] = game;
-    }
-
-    //return players obj if game created, null if added a player to a queue  
-    onCreateRWGame(playerId) {
-        if(this.playersInQueue.length === 0){
-            this.playersInQueue.push(playerId);
-            return null;
-        }
-        const opponentId = this.playersInQueue[0];
-        this.playersInQueue.splice(0, 1);
-        
-        this.addRWGame(playerId, opponentId);
-        return {
-            player1: playerId, 
-            player2: opponentId
-        };
     }
 
     addRWGame(idWhite, idBlack){
@@ -74,20 +83,28 @@ class GameDistributor {
         return game;
     }
 
-    onSurrender(playerId, fenString){
+    onSurrended(playerId){
         const game = this.playersToGamesDict[playerId];
-        
+        game.surrendedBy = playerId;
 
-        this.onDisposeGame();
+        this.onDisposeGame(playerId);
     }
 
-    onDisposeGame(playerId, fenString){
+    onRemoveFromQueue(playerId){
+        for(let i=0; i<this.playersInQueue.length; i++){
+            if(this.playersInQueue[i].playerId === playerId){
+                this.playersInQueue.splice(i, 1);
+            }
+        }
+    }
+
+    onDisposeGame(playerId){
         const game = this.playersToGamesDict[playerId];
         this.gameStorage.push({
             idWhite: game.idWhite,
             idBlack: game.idBlack,
             gameId: game.gameId,
-            fen: fenString
+            fen: game.engine.fen()
         });
         delete this.playersToGamesDict[game.idWhite];
         delete this.playersToGamesDict[game.idBlack];

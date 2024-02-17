@@ -254,7 +254,7 @@ export default class ChessGame{
         this.addHighlights(this.playerColorWhite ? 'white' : 'black', source, target);
         this.gameBoard.move(`${source}-${target}`);
         this.activePosition = null;
-        this.socket.emit('send-chess-move', source, target);
+        this.socket.emit('send-move', source, target);
         return true;
     }
 

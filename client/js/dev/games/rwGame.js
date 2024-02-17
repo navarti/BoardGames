@@ -189,7 +189,7 @@ export default class RWGame{
         this.addHighlights(this.playerColorWhite ? 'white' : 'black', source, target);
         this.gameBoard.move(`${source}-${target}`);
         this.activePosition = null;
-        this.socket.emit('send-rw-move', source, target);
+        this.socket.emit('send-move', source, target);
         return true;
     }
 

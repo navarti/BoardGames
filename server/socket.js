@@ -27,35 +27,20 @@ class Socket {
                 const game = global.gameDistributor.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);
                 socket.emit('send-game', game, this.socketsToEmailsDict[socket.id]);
             });
-            socket.on('send-rw-move', (source, target) => {
-                try{
-                    const game = global.gameDistributor.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);
-                    if(!game.move(source, target, this.socketsToEmailsDict[socket.id])){
-                        socket.emit('send-error');
-                        return;
-                    }
-                    if(game.rw.game_over()){
-                        global.gameDistributor.onDisposeGame(this.socketsToEmailsDict[socket.id], game.rw.fen());
-                    }
-                    socket.to(game.rw.turn() === 'w' ? game.idWhite : game.idBlack).
-                        emit('send-move-from-server', source, target);
-                }
-                catch(err){
-                    console.log('Error caused by: ' + this.socketsToEmailsDict[socket.id]);
-                    console.log(err);
-                }
+            socket.on('stop-seeking', () => {
+                global.gameDistributor.onDisposeGame(this.socketsToEmailsDict[socket.id]);
             });
-            socket.on('send-chess-move', (source, target) => {
+            socket.on('send-move', (source, target) => {
                 try{
                     const game = global.gameDistributor.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);
                     if(!game.move(source, target, this.socketsToEmailsDict[socket.id])){
                         socket.emit('send-error');
                         return;
                     }
-                    if(game.chess.isGameOver()){
-                        global.gameDistributor.onDisposeGame(this.socketsToEmailsDict[socket.id], game.chess.fen());
+                    if(game.isGameOver()){
+                        global.gameDistributor.onDisposeGame(this.socketsToEmailsDict[socket.id]);
                     }
-                    socket.to(game.chess.turn() === 'w' ? game.idWhite : game.idBlack).
+                    socket.to(game.engine.turn() === 'w' ? game.idWhite : game.idBlack).
                         emit('send-move-from-server', source, target);
                 }
                 catch(err){
@@ -73,12 +58,14 @@ class Socket {
                 const canCreate = global.gameDistributor.onCanCreateGame(this.socketsToEmailsDict[socket.id]);
                 socket.emit('can-create-game-response', canCreate);
             });
-            socket.on('create-chess-game', () => {
+            socket.on('create-game', gameType => {
+                socket.emit('can-create-game-response', false);
                 if(!global.gameDistributor.onCanCreateGame(this.socketsToEmailsDict[socket.id])){
                     socket.emit('send-alert', 'You have game in progress');
+                    socket.prependListener('')
                     return;
                 }
-                const players = global.gameDistributor.onCreateChessGame(this.socketsToEmailsDict[socket.id]); 
+                const players = global.gameDistributor.onCreate(this.socketsToEmailsDict[socket.id], gameType); 
                 if(!players){
                     return;
                 }
@@ -86,18 +73,13 @@ class Socket {
                 socket.to(players.player1).emit('game-ready');
                 socket.to(players.player2).emit('game-ready');
             });
-            socket.on('create-rw-game', () => {
-                if(!global.gameDistributor.onCanCreateGame(this.socketsToEmailsDict[socket.id])){
-                    socket.emit('send-alert', 'You have game in progress');
+            socket.on('surrend', () => {
+                const game = global.gameDistributor.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);
+                if(!game){
                     return;
                 }
-                const players = global.gameDistributor.onCreateRWGame(this.socketsToEmailsDict[socket.id]); 
-                if(!players){
-                    return;
-                }
-                socket.emit('game-ready');
-                socket.to(players.player1).emit('game-ready');
-                socket.to(players.player2).emit('game-ready');
+                global.gameDistributor.onSurrended(this.socketsToEmailsDict[socket.id]);
+                socket.emit('surrend-notify', this.socketsToEmailsDict[socket.id]);
             });
         });
     }
