@@ -29,7 +29,8 @@ export default class ChessGame{
         this.gameBoard = Chessboard(this.gameBoardName, {
             draggable: true,
             dropOffBoard: 'trash',
-            sparePieces: true
+            sparePieces: true,
+            pieceTheme: pieceTheme
         });
         this.adjustStyleForBoardTheme();
     }
@@ -47,14 +48,6 @@ export default class ChessGame{
     drawGame(){
         this.infoDisplay.textContent = '';
         this.playFor.innerHTML = this.playerColorWhite ?  'white' : 'black';
-
-        function pieceTheme (piece) {
-            if (piece.search(/w/) !== -1) {
-              return 'img/chesspieces/wikipedia/' + piece + '.png';
-            }
-          
-            return 'img/chesspieces/wikipedia/' + piece + '.png';
-        }
 
         function removeGreySquares () {
             $(`#${this.gameBoardName} .square-55d63`).css('background', '');
@@ -291,6 +284,11 @@ export default class ChessGame{
     }
 }
 
-
-
+function pieceTheme (piece) {
+    if (piece.search(/w/) !== -1) {
+      return 'img/chesspieces/' + piece + '.png';
+    }
+  
+    return 'img/chesspieces/' + piece + '.png';
+}
 

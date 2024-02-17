@@ -14,7 +14,7 @@ class GameDistributor {
     }
 
     onCanCreateGame(playerId){
-        //check if player is not waiting for game already and not have game in progress
+        //check if player is not waiting for game already and not having game in progress
 
         let isInQueue = false;
         for(let i=0; i<this.playersInQueue.length; i++){
@@ -22,7 +22,6 @@ class GameDistributor {
                 isInQueue = true;
             }
         }
-        const a = this.getGameByPlayerId(playerId);
         return !isInQueue && !this.getGameByPlayerId(playerId);
     }
 

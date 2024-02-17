@@ -31,7 +31,8 @@ export default class RWGame{
         this.gameBoard = Chessboard(this.gameBoardName, {
             draggable: true,
             dropOffBoard: 'trash',
-            sparePieces: true
+            sparePieces: true,
+            pieceTheme: pieceTheme
         });
         this.adjustStyleForBoardTheme();
     }
@@ -49,14 +50,6 @@ export default class RWGame{
     drawGame(){
         this.infoDisplay.textContent = '';
         this.playFor.innerHTML = this.playerColorWhite ?  'white' : 'black';
-
-        function pieceTheme (piece) {
-            if (piece.search(/w/) !== -1) {
-              return 'img/chesspieces/wikipedia/' + piece + '.png';
-            }
-          
-            return 'img/chesspieces/wikipedia/' + piece + '.png';
-        }
 
         function onDragStart (source, piece, position, orientation) {
             if(piece === ''){
@@ -227,6 +220,11 @@ export default class RWGame{
     }
 }
 
-
-
+function pieceTheme (piece) {
+    if (piece.search(/w/) !== -1) {
+      return 'img/rwpieces/' + piece + '.png';
+    }
+  
+    return 'img/rwpieces/' + piece + '.png';
+}
 
