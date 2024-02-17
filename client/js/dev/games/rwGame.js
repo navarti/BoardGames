@@ -63,7 +63,7 @@ export default class RWGame{
                 return;
             }
             // do not pick up pieces if the game is over
-            if (this.gameLogic.game_over()) return false;
+            if (this.gameLogic.game_over() || this.surrender) return false;
             // only pick up pieces for the side to move
             if((this.gameLogic.turn() === 'w' && !this.playerColorWhite) 
                 || (this.gameLogic.turn() === 'b' && this.playerColorWhite)){
@@ -134,7 +134,12 @@ export default class RWGame{
         }
     }
 
-    updateStatus () {
+    updateStatus (text = null) {
+        if(text){
+            this.infoDisplay.textContent = text;
+            return;
+        }
+        
         var status = '';
         
         const moveColor = this.gameLogic.turn() === 'w' ? 'White' : 'Black';
@@ -152,6 +157,7 @@ export default class RWGame{
     }
 
     socketInit(){
+        this.surrender = false;
         this.socket = window.storage.socket.socket;
         //socket requests
         this.socket.on('send-game', (game) => {
@@ -170,8 +176,14 @@ export default class RWGame{
             this.updateStatus();
         });
 
-        this.socket.on('send-error', () => {
-            this.infoDisplay.textContent = 'Illegal move';    
+        this.socket.on('surrender-notify', playerId => {
+            if(playerId === window.storage.socket.playerId){
+                this.updateStatus("You surrendered");
+            }
+            else{
+                this.updateStatus("You won because the opponent surrender");
+            }
+            this.surrender = true;
         });
         
         this.socket.emit('get-game');

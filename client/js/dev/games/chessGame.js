@@ -1,7 +1,5 @@
 export default class ChessGame{
-    constructor(){
-        this.storage = window.storage;
-        
+    constructor(){        
         this.init();
     }
 
@@ -91,7 +89,8 @@ export default class ChessGame{
                 return;
             }
             // do not pick up pieces if the game is over
-            if (this.gameLogic.game_over()) return false;
+            if (this.gameLogic.game_over() || this.surrender) return false;
+            
             // only pick up pieces for the side to move
             if((this.gameLogic.turn() === 'w' && !this.playerColorWhite) 
                 || (this.gameLogic.turn() === 'b' && this.playerColorWhite)){
@@ -180,7 +179,12 @@ export default class ChessGame{
         }
     }
 
-    updateStatus () {
+    updateStatus (text = null) {
+        if(text){
+            this.infoDisplay.textContent = text;
+            return;
+        }
+        
         var status = ''
         
         const moveColor = this.gameLogic.turn() === 'w' ? 'White' : 'Black';
@@ -208,12 +212,13 @@ export default class ChessGame{
     }
 
     socketInit(){
-        this.socket = this.storage.socket.socket;
+        this.socket = window.storage.socket.socket;
+        this.surrender = false;
         //socket requests
         this.socket.on('send-game', (game) => {
             this.gameInfo = game;
             this.gameLogic = new Chess(game.fen); 
-            this.playerColorWhite = this.gameInfo.idWhite === this.storage.socket.playerId;
+            this.playerColorWhite = this.gameInfo.idWhite === window.storage.socket.playerId;
             this.forWhite = this.playerColorWhite;
             this.drawGame();
         });
@@ -230,8 +235,14 @@ export default class ChessGame{
             this.updateStatus();
         });
 
-        this.socket.on('send-error', () => {
-            this.infoDisplay.textContent = 'Illegal move';    
+        this.socket.on('surrender-notify', playerId => {
+            if(playerId === window.storage.socket.playerId){
+                this.updateStatus("You surrendered");
+            }
+            else{
+                this.updateStatus("You won because the opponent surrender");
+            }
+            this.surrender = true;
         });
         
         this.socket.emit('get-game');
@@ -264,17 +275,6 @@ export default class ChessGame{
 
         const whiteSquaresColor = localStorage.lightSquares;
         const blackSquaresColor = localStorage.darkSquares;
-
-        // allElements.forEach(element => {
-        //     element.classList.forEach(className => {
-        //         if(className.startsWith('white')){
-        //             element.style.backgroundColor = whiteSquaresColor; 
-        //         }
-        //         if(className.startsWith('black')){
-        //             element.style.backgroundColor = blackSquaresColor; 
-        //         }
-        //     });
-        // });
 
         for(let i=0; i<allElements.length; i++){
             for(let j=0; j<allElements[i].classList.length;j++){

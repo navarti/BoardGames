@@ -34,7 +34,7 @@ class Socket {
                 try{
                     const game = global.gameDistributor.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);
                     if(!game.move(source, target, this.socketsToEmailsDict[socket.id])){
-                        socket.emit('send-error');
+                        socket.emit('send-alert', "Illegal move");
                         return;
                     }
                     if(game.isGameOver()){
@@ -59,10 +59,8 @@ class Socket {
                 socket.emit('can-create-game-response', canCreate);
             });
             socket.on('create-game', gameType => {
-                socket.emit('can-create-game-response', false);
                 if(!global.gameDistributor.onCanCreateGame(this.socketsToEmailsDict[socket.id])){
                     socket.emit('send-alert', 'You have game in progress');
-                    socket.prependListener('')
                     return;
                 }
                 const players = global.gameDistributor.onCreate(this.socketsToEmailsDict[socket.id], gameType); 
@@ -73,13 +71,18 @@ class Socket {
                 socket.to(players.player1).emit('game-ready');
                 socket.to(players.player2).emit('game-ready');
             });
-            socket.on('surrend', () => {
+            socket.on('remove-from-queue', () => {
+                global.gameDistributor.onRemoveFromQueue(this.socketsToEmailsDict[socket.id]);
+            });
+            socket.on('surrender', () => {
                 const game = global.gameDistributor.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);
                 if(!game){
                     return;
                 }
                 global.gameDistributor.onSurrended(this.socketsToEmailsDict[socket.id]);
-                socket.emit('surrend-notify', this.socketsToEmailsDict[socket.id]);
+                socket.emit('surrender-notify', this.socketsToEmailsDict[socket.id]);
+                socket.to(game.idWhite).emit('surrender-notify', this.socketsToEmailsDict[socket.id]);
+                socket.to(game.idBlack).emit('surrender-notify', this.socketsToEmailsDict[socket.id]);
             });
         });
     }

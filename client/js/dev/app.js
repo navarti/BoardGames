@@ -29,6 +29,10 @@ export default class App {
 
     socketInit(){
         this.socket = window.storage.socket.socket;
+        this.socket.on('surrender-notify', playerId => {
+            this.bindButtonsFreeToSeek();
+        });
+        
         //as a parameter can pass type of game in case
         this.socket.on('game-ready', () => {
             this.game.socketInit();
@@ -57,25 +61,24 @@ export default class App {
     bindButtonsFreeToSeek(){
         document.querySelector('#universalGameButton').value = 'Seek an opponent';
         document.querySelector('#universalGameButton').onclick = () => {
-            this.socket.emit(`create-game`, this.typeOfGame);
+            this.socket.emit(`create-game`, window.storage.getTypeOfGame());
+            this.bindButtonsWhileSeeking();
         };
     }
 
     bindButtonsWhileSeeking(){
-        document.querySelector('#universalGameButton').value = 'Stop seeking an opponent';
-                
-        //bind to stop seeking
+        document.querySelector('#universalGameButton').value = 'Stop seeking an opponent';        
         document.querySelector('#universalGameButton').onclick = () => {
-            
+            this.socket.emit(`remove-from-queue`);
+            this.bindButtonsFreeToSeek();
         };
     }
 
     bindButtonsWhilePlaying(){
         document.querySelector('#universalGameButton').value = 'Surrender';
-
-        //bind to surrender
         document.querySelector('#universalGameButton').onclick = () => {
-            
+            this.socket.emit(`surrender`);
+            this.bindButtonsFreeToSeek();
         };
     }
 }
