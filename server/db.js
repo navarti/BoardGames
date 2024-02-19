@@ -2,7 +2,7 @@ import knex from 'knex';
 import uuid from 'uuid';
 
 class DB {
-    constructor() {
+    constructor(){
         this.knex = knex({
             client: 'better-sqlite3',
             useNullAsDefault: true,
@@ -12,24 +12,24 @@ class DB {
         });
     }
 
-    async initDatabase() {
-        try {
+    async initDatabase(a=[]) {
+        try{
             let sql = global.fileManager.getInitSql();
             sql = sql.split('---');
 
-            for(let i = 0; i < sql.length; i++) {
+            for(let i = 0; i < sql.length; i++){
                 await this.knex.raw(sql[i]);
             }
-        } catch (err) {
+        } catch (err){
             console.log(`Error in initDatabase: ${err}`);
         }
     }
 
-    async createUser(nickname, email){
+    async createUser(email){
         try {
             let user = {
                 user_id: uuid.v4(),
-                nickname: nickname,
+                nickname: email,
                 email: email,
                 lastactive_date: this.knex.fn.now(),
                 registration_date: this.knex.fn.now()
@@ -58,17 +58,13 @@ class DB {
         }
     }
 
-    async updateUser(user) {
+    async updateUserNickname(email, nickname) {
         try {
             let result = await this.knex('users')
-                .where('email', user.email)
-                .update(user);
+                .where('email', email)
+                .update({nickname: nickname});
 
-            if(result == 0) {
-                console.log(`New user ${user.email} 'registered.`);
-            }
-
-            console.log(`User was ${user.email} updated.`);
+            console.log(`User ${email} was updated.`);
             return result;
         } catch (err) {
             console.log(`Error in createOrUpdateUser: ${err}`);
@@ -88,8 +84,8 @@ class DB {
         }
     }
 
-    async createGame(game_type, fen_string, player1, player2) {
-        try {
+    async createGame(game_type, fen_string, player1, player2){
+        try{
             let game = {
                 game_id: uuid.v4(),
                 game_type: game_type,
@@ -109,7 +105,7 @@ class DB {
         }
     }
 
-    async getGamesByPlayerId(playerId, skip, take) {
+    async getGamesByPlayerId(playerId, skip, take){
         try {
             const result = await this.knex('games')
                 .select('*')

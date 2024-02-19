@@ -3,6 +3,18 @@ class Router {
         
     }
 
+    ok(res){
+        res.status(200).send();
+    }
+
+    unathorized(res){
+        res.status(401).send();
+    }
+    
+    badRequest(res) {
+        res.status(400).send();
+    }
+
     async onClient(req, res){
         res.set('Access-Control-Allow-Origin', '*');
         res.json({client: global.auth.getClient(), redirect: global.auth.getRedirect()});
@@ -42,12 +54,41 @@ class Router {
         }
     }
 
-    ok(res){
-        res.status(200).send();
-    }
-    
-    badRequest(res) {
-        res.status(400).send();
+    async onChangeNickName(req, res){
+        res.set('Access-Control-Allow-Origin', '*');
+        
+        if(!global.auth.checkKey(key)){
+            socket.emit('send-alert', 'Log in to your account!');
+            socket.disconnect(0);
+        }
+
+        if(!req.cookies || !req.cookies.key) {
+            this.unathorized(res);
+            return;
+        }
+
+        if(!global.auth.checkKey(req.cookies.key)) {
+            this.unathorized(res);
+            return;
+        }
+
+        const nickname = req.body.nickname;
+
+        if(!nickname){
+            this.badRequest(res);
+            return;
+        }
+
+        const email = global.auth.getEmail(req.cookies.key);
+
+        await global.db.updateUserNickname(email, nickname);
+
+        if(!game.move(positionFrom, positionTo, playerId)){
+            this.badRequest(res);
+            return;
+        }
+        // res.redirect('/');
+        this.ok(res);
     }
 }
 

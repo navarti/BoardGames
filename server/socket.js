@@ -14,13 +14,21 @@ class Socket {
     }
 
     manageRequests(){
-        this.io.on('connection', socket => {
+        this.io.on('connection', async socket => {
+            // Auth
             const key = socket.handshake.query['key'];
             if(!global.auth.checkKey(key)){
                 socket.emit('send-alert', 'Log in to your account!');
                 socket.disconnect(0);
             }
             const email = global.auth.getEmail(key);
+
+            //DB
+            let user = await global.db.getUserByEmail(email);
+            if(!user){
+                user = await global.db.createUser(email);
+            }
+
             this.socketsToEmailsDict[socket.id] = email;
             if(this.emailsToSocketsDict[email]){
                 delete this.socketsToEmailsDict[this.emailsToSocketsDict[email].id];
@@ -28,11 +36,14 @@ class Socket {
             }
             this.emailsToSocketsDict[email] = socket;
 
+            // socket requests
             socket.join(this.socketsToEmailsDict[socket.id]);
             socket.emit('send-userID', this.socketsToEmailsDict[socket.id]);
 
             socket.on('get-game', () => {
                 const game = global.gameDistributor.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);
+
+                //Rename to get-game-response
                 socket.emit('send-game', game, this.socketsToEmailsDict[socket.id]);
             });
             socket.on('stop-seeking', () => {
@@ -42,6 +53,8 @@ class Socket {
                 try{
                     const game = global.gameDistributor.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);
                     if(!game.move(source, target, this.socketsToEmailsDict[socket.id])){
+
+                        //rename to alert-response
                         socket.emit('send-alert', "Illegal move");
                         return;
                     }
@@ -52,6 +65,8 @@ class Socket {
                         socket.to(game.idWhite).emit('gameOver-notify');
                         socket.to(game.idBlack).emit('gameOver-notify');
                     }
+
+                    //rename to get move from server
                     socket.to(game.engine.turn() === 'w' ? game.idWhite : game.idBlack).
                         emit('send-move-from-server', source, target);
                 }

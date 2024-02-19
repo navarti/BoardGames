@@ -1,6 +1,5 @@
 import express from 'express';
-//useless
-//import bodyParser from 'body-parser';
+import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import c from 'chalk';
 import Router from './router.js';
@@ -17,11 +16,10 @@ class App {
     run() {
         const router = new Router();
 
-        //now is useless 
-        // this.app.use(bodyParser.json());
-        // this.app.use(bodyParser.urlencoded({
-        //     extended: true
-        // }));
+        this.app.use(bodyParser.json());
+        this.app.use(bodyParser.urlencoded({
+            extended: true
+        }));
 
         this.app.use(cookieParser());
 
