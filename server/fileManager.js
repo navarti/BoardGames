@@ -12,6 +12,10 @@ class FileManager {
     getConfig(){
         return fs.readFileSync('config.json');
     }
+
+    getInitSql(){
+        return fs.readFileSync(`../db/initialization.sql`).toString();
+    }
 }
 
 export default FileManager;
