@@ -49,6 +49,9 @@ export default class App {
                 this.bindButtonsFreeToSeek();
             }
         });
+        this.socket.on('gameOver-notify', () => {
+            this.bindButtonsFreeToSeek();
+        });
         this.socket.emit('can-create-game');
     }
 

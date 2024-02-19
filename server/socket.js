@@ -8,6 +8,7 @@ class Socket {
                 methods: ["GET", "POST"]
             }
         });
+        this.emailsToSocketsDict = {};
         this.socketsToEmailsDict = {};
         this.manageRequests();
     }
@@ -19,7 +20,14 @@ class Socket {
                 socket.emit('send-alert', 'Log in to your account!');
                 socket.disconnect(0);
             }
-            this.socketsToEmailsDict[socket.id] = global.auth.getEmail(key);
+            const email = global.auth.getEmail(key);
+            this.socketsToEmailsDict[socket.id] = email;
+            if(this.emailsToSocketsDict[email]){
+                delete this.socketsToEmailsDict[this.emailsToSocketsDict[email].id];
+                this.emailsToSocketsDict[email].disconnect(0);
+            }
+            this.emailsToSocketsDict[email] = socket;
+
             socket.join(this.socketsToEmailsDict[socket.id]);
             socket.emit('send-userID', this.socketsToEmailsDict[socket.id]);
 
@@ -39,6 +47,10 @@ class Socket {
                     }
                     if(game.isGameOver()){
                         global.gameDistributor.onDisposeGame(this.socketsToEmailsDict[socket.id]);
+                        
+                        socket.emit('gameOver-notify');
+                        socket.to(game.idWhite).emit('gameOver-notify');
+                        socket.to(game.idBlack).emit('gameOver-notify');
                     }
                     socket.to(game.engine.turn() === 'w' ? game.idWhite : game.idBlack).
                         emit('send-move-from-server', source, target);
