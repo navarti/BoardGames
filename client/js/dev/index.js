@@ -1,4 +1,6 @@
 import App from './app.js'
 
-const app = new App();
+document.addEventListener('partialsLoaded', () => {
+    const app = new App();
+});
 

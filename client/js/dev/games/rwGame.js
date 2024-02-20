@@ -156,7 +156,7 @@ export default class RWGame{
         this.socket.on('send-game', (game) => {
             this.gameInfo = game;
             this.gameLogic = new RabbitandWolfs(game.fen); 
-            this.playerColorWhite = this.gameInfo.idWhite === window.storage.socket.playerId;
+            this.playerColorWhite = this.gameInfo.idWhite === window.storage.getUserInfo().email;
             this.forWhite = this.playerColorWhite;
             this.drawGame();
         });
@@ -170,7 +170,7 @@ export default class RWGame{
         });
 
         this.socket.on('surrender-notify', playerId => {
-            if(playerId === window.storage.socket.playerId){
+            if(playerId === window.storage.getUserInfo().email){
                 this.updateStatus("You surrendered");
             }
             else{

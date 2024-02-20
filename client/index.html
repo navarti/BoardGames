@@ -27,50 +27,52 @@
         <!-- socket.io   -->
         <script defer src="http://localhost:3000/socket.io/socket.io.js"></script>
         <!-- socket.io   -->
+
+        <!-- bootstrap -->
+
+        <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script> -->
+        
+        <!-- bootstrap -->
         
         <!-- script -->
         <script src='js/dev/index.js' type="module"></script>
     </head>
-    <header>
-          <div class="nav">
-            <input type="checkbox" id="nav-check">
-            <div class="nav-header">
-              <div class="nav-title">
-                <a href="/">Board Games</a>
-              </div>
-            </div>
-            <div class="nav-btn">
-              <label for="nav-check">
-                <span></span>
-                <span></span>
-                <span></span>
-              </label>
-            </div>
-            
-            <div class="nav-links">
-              <a id="chessButton">Chess</a>
-              <a id="rwButton">Rabbit and Wolfs</a>
-              <a id="changeThemeButton" href="">Theme</a>
-              <a href="https://jsfiddle.net/user/jo_Geek/" target="_blank">Profile</a>
-              <a id="log-button" href="">Log in</a>
-
-            </div>
-          </div>
-    </header>
+    
     <body>
-      <div class="sections">
-        <div class="details-section">
-          <p>Logged as <span id="playerId"></span></p>
-          <p>Welcome to <span id="gameName"></span></p>
-          <input id="universalGameButton" type="button" value="Seek an opponent">
-        </div>
-        <div class="game-section">
-          <p>You play for <span id="playFor"></span></p>
-          <button id="revertBoardButton">Revert board</button>
-          <div id="gameboard"></div>
-          <p id="info-display"></p>
-        </div>
-      </div>
+        <header>
+            <div class="nav">
+                <input type="checkbox" id="nav-check">
+                <div class="nav-header">
+                    <div class="nav-title">
+                        <a href="/">Board Games</a>
+                    </div>
+                </div>
+                <div class="nav-btn">
+                    <label for="nav-check">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </label>
+                </div>
+                <div class="nav-links">
+                    <a id="chessButton">Chess</a>
+                    <a id="rwButton">Rabbit and Wolfs</a>
+                    <a id="changeThemeButton" href="">Theme</a>
+                    <a href="https://jsfiddle.net/user/jo_Geek/" target="_blank">Profile</a>
+                    <a id="log-button" href="">Log in</a>
+                </div>
+            </div>
+        </header>
+
+        <main>
+
+            <section id="main-section" data-include="./partials/game.html"></section>
+
+        </main>
+
+        <footer></footer>
+
+        <script src="https://unpkg.com/html-data-include@3.3.3/html-data-include.js"></script>
     </body>
-    <footer></footer>
 </html>

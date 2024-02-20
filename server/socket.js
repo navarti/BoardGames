@@ -38,7 +38,7 @@ class Socket {
 
             // socket requests
             socket.join(this.socketsToEmailsDict[socket.id]);
-            socket.emit('send-userID', this.socketsToEmailsDict[socket.id]);
+            socket.emit('send-userInfo-from-server', user);
 
             socket.on('get-game', () => {
                 const game = global.gameDistributor.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);

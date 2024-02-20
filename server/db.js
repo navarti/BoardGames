@@ -1,5 +1,5 @@
 import knex from 'knex';
-import uuid from 'uuid';
+import * as uuid from 'uuid';
 
 class DB {
     constructor(){
@@ -35,12 +35,12 @@ class DB {
                 registration_date: this.knex.fn.now()
             }
 
-            result = await this.knex('users').insert(user);
+            const result = await this.knex('users').insert(user);
             console.log(`New user ${user.email} registered.`);
-            return result;
+            return user;
         }
         catch (err) {
-            console.log(`Error in createOrUpdateUser: ${err}`);
+            console.log(`Error in createUser: ${err}`);
         }
     }
 

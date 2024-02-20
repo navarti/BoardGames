@@ -24,6 +24,13 @@ export default class Storage{
         localStorage.gameType = type;
     }
 
+    getUserInfo(){
+        if(!localStorage.userInfo){
+            window.location.reload();
+        }
+        return localStorage.userInfo;
+    }
+
     getAuth() {
         let auth = this.getCookie('key');
         if(auth) return auth;
