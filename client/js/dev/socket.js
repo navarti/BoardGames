@@ -1,10 +1,14 @@
 export default class Socket{
-    constructor(key){
-        this.socket = io('localhost:3000', { transports : ['websocket'], query: `key=${key}` });
-        this.socket.on('send-userInfo-from-server', userInfo => {
-            localStorage.userInfo = userInfo;
+    constructor(){
+        const auth = window.storage.getAuth();
 
-            document.querySelector('#playerId').innerHTML = userInfo.email;
+        if(!auth){
+            return;
+        }
+
+        this.socket = io('localhost:3000', { transports : ['websocket'], query: `key=${auth}` });
+        this.socket.on('send-userInfo-from-server', userInfo => {
+            window.storage.setUserInfo(userInfo);
         });
         this.socket.on('send-alert', warning => {
             alert(warning);

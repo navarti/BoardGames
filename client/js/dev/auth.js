@@ -1,8 +1,6 @@
 export default class Auth {
     constructor() {
-        this.storage = window.storage;
-
-        if(!this.check()) {
+        if(!window.storage.getAuth()) {
             this.setVisibility('deauthed');
         } else {
             this.setVisibility('authed');
@@ -14,18 +12,13 @@ export default class Auth {
         }
     }
 
-    check() {
-        if(this.storage.getAuth() == null) return false;
-        return true;
-    }
-
     async onAuth() {
         const url = await this.getAuthURL();
         window.location.href = url;
     }
 
     onLogout() {
-        this.storage.deleteAuth();
+        window.storage.deleteAuth();
         window.location.reload();
     }
 
@@ -52,7 +45,7 @@ export default class Auth {
     }
 
     async getAuthURL() {
-        const data = await this.storage.api.getClient();
+        const data = await window.storage.api.getClient();
         const client = data.client; 
         const redirect = data.redirect;
         const rootUrl = 'https://accounts.google.com/o/oauth2/v2/auth';

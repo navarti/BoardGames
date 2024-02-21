@@ -1,4 +1,3 @@
-import Socket from './socket.js';
 import API from './API.js';
 
 export default class Storage{
@@ -8,9 +7,10 @@ export default class Storage{
 
         this.playerId = parseInt(localStorage.playerId);
         this.api = new API();
-        if(this.getAuth()){
-            this.socket = new Socket(this.getAuth());
-        }
+    }
+
+    setSocket(socket){
+        this.socket = socket;
     }
 
     getTypeOfGame(){
@@ -28,7 +28,14 @@ export default class Storage{
         if(!localStorage.userInfo){
             window.location.reload();
         }
-        return localStorage.userInfo;
+        return JSON.parse(localStorage.userInfo);
+    }
+
+    setUserInfo(userInfo){
+        localStorage.userInfo = JSON.stringify(userInfo);
+
+        //bind everything
+        document.querySelector('#playerId').innerHTML = userInfo.email;
     }
 
     getAuth() {
