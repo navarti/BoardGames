@@ -11,14 +11,30 @@ export default class Profile{
     }
 
     bindButtonsWithoutLogIn(){
-        alert('Log in to see profile');
+        document.querySelector('#profileButton').onclick = () => {
+            alert('Log in to see profile');
+        }
     }
 
     bindButtons(){
+        document.querySelector('#profileButton').onclick = () => {
+            document.querySelector('.profile-section').classList.remove('d-none');
+            window.storage.setTypeOfGame(null);
+            document.querySelector('.game-section').classList.add('d-none');
+        }
+
+        // document.querySelector('#profileButton').addEventListener('click', () => {
+        //     document.querySelector('.profile-section').classList.remove('d-none');  
+        // });
+
         
     }
 
     bindText(){
-        
+        const userInfo = window.storage.getUserInfo();
+
+        document.querySelector('#profile-section__email').innerHTML = userInfo.email;
+        document.querySelector('#profile-section__nickname').value = userInfo.nickname;
+        document.querySelector('#profile-section__date-registered').innerHTML = userInfo.registration_date;
     }
 }

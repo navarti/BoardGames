@@ -15,7 +15,19 @@ export default class GameManager {
             this.bindButtonsWithoutLogIn();
             return;
         }
+
+        // this.bindElements();
         this.socketInit();
+    }
+
+    bindElements(){
+        // document.querySelector('#profileButton').onclick = () => {
+        //     document.querySelector('.game-section').classList.add('d-none');
+        // }
+
+        // document.querySelector('#profileButton').addEventListener('click', () => {
+        //     document.querySelector('.game-section').classList.add('d-none');  
+        // });
     }
 
     socketInit(){

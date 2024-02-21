@@ -14,7 +14,9 @@ export default class Storage{
     }
 
     getTypeOfGame(){
-        if(!localStorage.gameType){
+        if(!localStorage.gameType 
+            || localStorage.gameType !== this.chessName 
+            || localStorage.gameType !== this.rwName){
             localStorage.gameType = this.chessName;
         }
         return localStorage.gameType;
