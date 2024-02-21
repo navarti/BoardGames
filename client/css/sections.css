@@ -1,4 +1,4 @@
-.game-section__wrapper{
+.game-section{
     display: flex;
     flex-direction: row;    
     justify-content: space-around;
