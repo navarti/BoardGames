@@ -6,7 +6,7 @@ export default class Socket{
             return;
         }
 
-        this.socket = io('localhost:3000', { transports : ['websocket'], query: `key=${auth}` });
+        this.socket = io('https://localhost:3000', { transports : ['websocket'], query: `key=${auth}` });
         this.socket.on('send-userInfo-from-server', userInfo => {
             window.storage.setUserInfo(userInfo);
         });

@@ -1,10 +1,10 @@
+import https from 'https';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import c from 'chalk';
 import Router from './router.js';
 import Socket from './socket.js';
-
 
 class App {
     constructor(port) {
@@ -25,9 +25,23 @@ class App {
 
         this.app.get('/client',   (req, res) => router.onClient(req, res));
         this.app.get('/auth',   (req, res) => router.onAuth(req, res));
+        this.app.post('/upd_nickname',   (req, res) => router.onChangeNickName(req, res));
 
-        const httpServer = this.app.listen(this.port, this.onListen());
-        this.socket = new Socket(httpServer);
+        //old
+
+        // const httpServer = this.app.listen(this.port, this.onListen());
+
+        // new
+        const options = {
+            key: global.fileManager.getServerKey(),
+            cert: global.fileManager.getServerCrt(),
+        };
+
+        const httpsServer = https.createServer(options, this.app);
+        httpsServer.listen(this.port, this.onListen());
+
+        //same
+        this.socket = new Socket(httpsServer);
     }
 
     onListen() {

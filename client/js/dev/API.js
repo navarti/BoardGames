@@ -1,22 +1,24 @@
 export default class API{
     constructor(){
-        // this.serverURL = 'http://192.168.168.100:3000';
-        this.serverURL = 'http://127.0.0.1:3000';
+        // this.serverURL = 'http://192.168.56.1:3000';
+        this.serverURL = 'https://127.0.0.1:3000';
     }
 
-    async POSTRequest(url, body = null) {
+    // Post || Put request
+    async request(method, url, body = null) {
         if (body) {
             body = new URLSearchParams(body);
         }
     
         const options = {
-            method: 'POST',
-            body: body 
+            method: method,
+            body: body,
+            credentials: 'include'
         };
     
         const res = await fetch(url, options);
         return res;
-    } 
+    }
     
     async GETRequest(url, params){
         if (params) {
@@ -44,4 +46,15 @@ export default class API{
         const data = await this.getJsonFromRes(res);
         return data;
     }
+
+    async putNickname(newNickname){
+        const body = {
+            nickname: newNickname
+        };
+        const res = await this.request('POST', this.serverURL + '/upd_nickname', body);
+        return res;
+    }
 }
+
+
+

@@ -27,7 +27,9 @@ export default class Profile{
         //     document.querySelector('.profile-section').classList.remove('d-none');  
         // });
 
-        
+        document.querySelector('#saveChangesButton').onclick = () => {
+            window.storage.api.putNickname(document.querySelector('#profile-section__nickname').value);
+        }  
     }
 
     bindText(){

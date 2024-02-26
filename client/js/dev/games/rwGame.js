@@ -222,9 +222,10 @@ export default class RWGame{
 
 function pieceTheme (piece) {
     if (piece.search(/w/) !== -1) {
-      return 'img/rwpieces/' + piece + '.png';
+        return 'img/rwpieces/wP.png';
+    //   return 'img/rwpieces/' + piece + '.png';
     }
-  
-    return 'img/rwpieces/' + piece + '.png';
+    return 'img/rwpieces/bP.png';
+    // return 'img/rwpieces/' + piece + '.png';
 }
 

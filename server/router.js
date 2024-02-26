@@ -55,12 +55,9 @@ class Router {
     }
 
     async onChangeNickName(req, res){
-        res.set('Access-Control-Allow-Origin', '*');
-        
-        if(!global.auth.checkKey(key)){
-            socket.emit('send-alert', 'Log in to your account!');
-            socket.disconnect(0);
-        }
+        res.set('SupportsCredentials', 'true');
+        res.set('Access-Control-Allow-Origin', req.headers.origin);
+        res.set('Access-Control-Allow-Credentials', 'true');
 
         if(!req.cookies || !req.cookies.key) {
             this.unathorized(res);
@@ -83,10 +80,6 @@ class Router {
 
         await global.db.updateUserNickname(email, nickname);
 
-        if(!game.move(positionFrom, positionTo, playerId)){
-            this.badRequest(res);
-            return;
-        }
         // res.redirect('/');
         this.ok(res);
     }
