@@ -20,7 +20,7 @@ export default class Profile{
         document.querySelector('#profileButton').onclick = () => {
             this.bindText();
             document.querySelector('.profile-section').classList.remove('d-none');
-            window.storage.setTypeOfGame(null);
+            window.storage.setTypeOfGame(window.storage.profileName);
             document.querySelector('.game-section').classList.add('d-none');
         }
 

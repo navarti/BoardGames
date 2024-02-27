@@ -18,6 +18,15 @@ export default class App {
         this.profile = new Profile(); 
         this.header = new Header(); 
         this.gameManager = new GameManager();
+
+        this.changeTab();
+    }
+
+    changeTab(){
+        if(window.storage.getTypeOfGame() === window.storage.profileName){
+            document.querySelector('#profileButton').click();
+        }
     }
 }
+
 

@@ -4,6 +4,7 @@ export default class Storage{
     constructor(){
         this.chessName = "chess";
         this.rwName = "rw";
+        this.profileName = "profile";
 
         this.playerId = parseInt(localStorage.playerId);
         this.api = new API();
@@ -15,8 +16,9 @@ export default class Storage{
 
     getTypeOfGame(){
         if(!localStorage.gameType 
-            || (localStorage.gameType !== this.chessName 
-                && localStorage.gameType !== this.rwName)
+            || (localStorage.gameType !== this.chessName
+                && localStorage.gameType !== this.rwName
+                && localStorage.gameType !== this.profileName)
             ){
             localStorage.gameType = this.chessName;
         }
