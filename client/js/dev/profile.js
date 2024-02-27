@@ -18,6 +18,7 @@ export default class Profile{
 
     bindButtons(){
         document.querySelector('#profileButton').onclick = () => {
+            this.bindText();
             document.querySelector('.profile-section').classList.remove('d-none');
             window.storage.setTypeOfGame(null);
             document.querySelector('.game-section').classList.add('d-none');
@@ -27,9 +28,20 @@ export default class Profile{
         //     document.querySelector('.profile-section').classList.remove('d-none');  
         // });
 
-        document.querySelector('#saveChangesButton').onclick = () => {
-            window.storage.api.putNickname(document.querySelector('#profile-section__nickname').value);
-        }  
+        document.querySelector('#saveChangesButton').onclick = async () => {
+            const res = await window.storage.api.postNickname(document.querySelector('#profile-section__nickname').value);
+            if(res.status === 200){
+                window.location.reload();
+            }
+            if(res.status === 400){
+                alert('This nickname is not allowed');
+                return;
+            }
+            if(res.status === 401){
+                alert('Log in your account!');
+            }
+            
+        }
     }
 
     bindText(){

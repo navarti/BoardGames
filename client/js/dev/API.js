@@ -13,7 +13,6 @@ export default class API{
         const options = {
             method: method,
             body: body,
-            credentials: 'include'
         };
     
         const res = await fetch(url, options);
@@ -47,9 +46,10 @@ export default class API{
         return data;
     }
 
-    async putNickname(newNickname){
+    async postNickname(newNickname){
         const body = {
-            nickname: newNickname
+            nickname: newNickname,
+            key: window.storage.getAuth()
         };
         const res = await this.request('POST', this.serverURL + '/upd_nickname', body);
         return res;

@@ -55,16 +55,16 @@ class Router {
     }
 
     async onChangeNickName(req, res){
-        res.set('SupportsCredentials', 'true');
-        res.set('Access-Control-Allow-Origin', req.headers.origin);
-        res.set('Access-Control-Allow-Credentials', 'true');
+        res.set('Access-Control-Allow-Origin', '*');
 
-        if(!req.cookies || !req.cookies.key) {
+        const key = req.body.key;
+
+        if(!key){
             this.unathorized(res);
             return;
         }
 
-        if(!global.auth.checkKey(req.cookies.key)) {
+        if(!global.auth.checkKey(key)) {
             this.unathorized(res);
             return;
         }
@@ -76,7 +76,7 @@ class Router {
             return;
         }
 
-        const email = global.auth.getEmail(req.cookies.key);
+        const email = global.auth.getEmail(key);
 
         await global.db.updateUserNickname(email, nickname);
 
