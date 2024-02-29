@@ -8,8 +8,8 @@ class Socket {
                 methods: ["GET", "POST"]
             }
         });
-        this.emailsToSocketsDict = {};
-        this.socketsToEmailsDict = {};
+        this.idsToSocketsDict = {};
+        this.socketsToIdsDict = {};
         this.manageRequests();
     }
 
@@ -29,37 +29,34 @@ class Socket {
                 user = await global.db.createUser(email);
             }
 
-            this.socketsToEmailsDict[socket.id] = email;
-            if(this.emailsToSocketsDict[email]){
-                delete this.socketsToEmailsDict[this.emailsToSocketsDict[email].id];
-                this.emailsToSocketsDict[email].disconnect(0);
+            this.socketsToIdsDict[socket.id] = user.user_id;
+            if(this.idsToSocketsDict[user.user_id]){
+                delete this.socketsToIdsDict[this.idsToSocketsDict[user.user_id].id];
+                this.idsToSocketsDict[user.user_id].disconnect(0);
             }
-            this.emailsToSocketsDict[email] = socket;
+            this.idsToSocketsDict[user.user_id] = socket;
 
             // socket requests
-            socket.join(this.socketsToEmailsDict[socket.id]);
+            socket.join(this.socketsToIdsDict[socket.id]);
             socket.emit('send-userInfo-from-server', user);
-
+            
             socket.on('get-game', () => {
-                const game = global.gameDistributor.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);
+                const game = global.gameDistributor.getGameByPlayerId(this.socketsToIdsDict[socket.id]);
 
                 //Rename to get-game-response
-                socket.emit('send-game', game, this.socketsToEmailsDict[socket.id]);
-            });
-            socket.on('stop-seeking', () => {
-                global.gameDistributor.onDisposeGame(this.socketsToEmailsDict[socket.id]);
+                socket.emit('send-game', game, this.socketsToIdsDict[socket.id]);
             });
             socket.on('send-move', (source, target) => {
                 try{
-                    const game = global.gameDistributor.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);
-                    if(!game.move(source, target, this.socketsToEmailsDict[socket.id])){
+                    const game = global.gameDistributor.getGameByPlayerId(this.socketsToIdsDict[socket.id]);
+                    if(!game.move(source, target, this.socketsToIdsDict[socket.id])){
 
                         //rename to alert-response
                         socket.emit('send-alert', "Illegal move");
                         return;
                     }
                     if(game.isGameOver()){
-                        global.gameDistributor.onDisposeGame(this.socketsToEmailsDict[socket.id]);
+                        global.gameDistributor.onDisposeGame(this.socketsToIdsDict[socket.id]);
                         
                         socket.emit('gameOver-notify');
                         socket.to(game.idWhite).emit('gameOver-notify');
@@ -71,26 +68,26 @@ class Socket {
                         emit('send-move-from-server', source, target);
                 }
                 catch(err){
-                    console.log('Error caused by: ' + this.socketsToEmailsDict[socket.id]);
+                    console.log('Error caused by: ' + this.socketsToIdsDict[socket.id]);
                     console.log(err);
                 }
             });
             socket.on('check-game-in-progress', () => {
-                if(global.gameDistributor.getGameByPlayerId(this.socketsToEmailsDict[socket.id])){
+                if(global.gameDistributor.getGameByPlayerId(this.socketsToIdsDict[socket.id])){
                     socket.emit('game-ready');
                     return;
                 }
             });
             socket.on('can-create-game', () => {
-                const canCreate = global.gameDistributor.onCanCreateGame(this.socketsToEmailsDict[socket.id]);
+                const canCreate = global.gameDistributor.onCanCreateGame(this.socketsToIdsDict[socket.id]);
                 socket.emit('can-create-game-response', canCreate);
             });
             socket.on('create-game', gameType => {
-                if(!global.gameDistributor.onCanCreateGame(this.socketsToEmailsDict[socket.id])){
+                if(!global.gameDistributor.onCanCreateGame(this.socketsToIdsDict[socket.id])){
                     socket.emit('send-alert', 'You have game in progress');
                     return;
                 }
-                const players = global.gameDistributor.onCreate(this.socketsToEmailsDict[socket.id], gameType); 
+                const players = global.gameDistributor.onCreate(this.socketsToIdsDict[socket.id], gameType); 
                 if(!players){
                     return;
                 }
@@ -99,17 +96,17 @@ class Socket {
                 socket.to(players.player2).emit('game-ready');
             });
             socket.on('remove-from-queue', () => {
-                global.gameDistributor.onRemoveFromQueue(this.socketsToEmailsDict[socket.id]);
+                global.gameDistributor.onRemoveFromQueue(this.socketsToIdsDict[socket.id]);
             });
-            socket.on('surrender', () => {
-                const game = global.gameDistributor.getGameByPlayerId(this.socketsToEmailsDict[socket.id]);
+            socket.on('surrender', async () => {
+                const game = global.gameDistributor.getGameByPlayerId(this.socketsToIdsDict[socket.id]);
                 if(!game){
                     return;
                 }
-                global.gameDistributor.onSurrended(this.socketsToEmailsDict[socket.id]);
-                socket.emit('surrender-notify', this.socketsToEmailsDict[socket.id]);
-                socket.to(game.idWhite).emit('surrender-notify', this.socketsToEmailsDict[socket.id]);
-                socket.to(game.idBlack).emit('surrender-notify', this.socketsToEmailsDict[socket.id]);
+                await global.gameDistributor.onSurrended(this.socketsToIdsDict[socket.id]);
+                socket.emit('surrender-notify', this.socketsToIdsDict[socket.id]);
+                socket.to(game.idWhite).emit('surrender-notify', this.socketsToIdsDict[socket.id]);
+                socket.to(game.idBlack).emit('surrender-notify', this.socketsToIdsDict[socket.id]);
             });
         });
     }

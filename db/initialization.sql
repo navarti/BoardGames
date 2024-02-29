@@ -12,8 +12,10 @@ CREATE TABLE IF NOT EXISTS `games` (
   `game_id` VARCHAR(36) NOT NULL,
   `game_type` VARCHAR(45) NULL,
   `fen_string` VARCHAR(45) NULL,
--- Make foreign KEYS!!!!
-  `player1` VARCHAR(36) NULL,
-  `player2` VARCHAR(36) NULL,
+  `idWhite` VARCHAR(36) NULL,
+  `idBlack` VARCHAR(36) NULL,
   `game_time` TIMESTAMP NULL,
-  PRIMARY KEY (`game_id`));
+  PRIMARY KEY (`game_id`),
+  FOREIGN KEY ('idWhite') REFERENCES 'users'('user_id'),
+  FOREIGN KEY ('idBlack') REFERENCES 'users'('user_id')
+);

@@ -7,10 +7,11 @@ class GameDistributor {
         this.rwName = 'rw';
 
         this.playersInQueue = [];
+        this.playersToIndexesInQueue = {};
+
         this.counterGameId = 1;
         this.gameList = [];
         this.playersToGamesDict = {};
-        this.gameStorage = [];
     }
 
     onCanCreateGame(playerId){
@@ -51,6 +52,7 @@ class GameDistributor {
                 };
             }
         }
+        this.playersToIndexesInQueue[playerId] = this.playersInQueue.length;
         this.playersInQueue.push({playerId: playerId, gameType: gameType});
         return null;
     }
@@ -82,31 +84,22 @@ class GameDistributor {
         return game;
     }
 
-    onSurrended(playerId){
+    async onSurrended(playerId){
         const game = this.playersToGamesDict[playerId];
         game.surrendedBy = playerId;
 
-        this.onDisposeGame(playerId);
+        await this.onDisposeGame(playerId);
     }
 
     onRemoveFromQueue(playerId){
-        for(let i=0; i<this.playersInQueue.length; i++){
-            if(this.playersInQueue[i].playerId === playerId){
-                this.playersInQueue.splice(i, 1);
-            }
-        }
+        this.playersInQueue.splice(this.playersToIndexesInQueue[playerId], 1);
     }
 
-    onDisposeGame(playerId){
+    async onDisposeGame(playerId){
         const game = this.playersToGamesDict[playerId];
-        this.gameStorage.push({
-            idWhite: game.idWhite,
-            idBlack: game.idBlack,
-            gameId: game.gameId,
-            fen: game.engine.fen()
-        });
         delete this.playersToGamesDict[game.idWhite];
         delete this.playersToGamesDict[game.idBlack];
+        await global.db.createGame(game.type, game.engine.fen(), game.idWhite, game.idBlack);
     }
 }
 

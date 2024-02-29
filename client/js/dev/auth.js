@@ -23,7 +23,7 @@ export default class Auth {
     }
 
     setVisibility(visibility) {
-        const logButton = document.querySelector('#log-button'); 
+        const logButton = document.querySelector('#logButton'); 
         if(visibility === "deauthed"){
             logButton.innerHTML = 'Log in';
             logButton.onclick = (e) => {

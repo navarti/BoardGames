@@ -37,7 +37,7 @@ class DB {
 
             const result = await this.knex('users').insert(user);
             console.log(`New user ${user.email} registered.`);
-            return user;
+            return result;
         }
         catch (err) {
             console.log(`Error in createUser: ${err}`);
@@ -84,14 +84,14 @@ class DB {
         }
     }
 
-    async createGame(game_type, fen_string, player1, player2){
+    async createGame(game_type, fen_string, idWhite, idBlack){
         try{
             let game = {
                 game_id: uuid.v4(),
                 game_type: game_type,
                 fen_string: fen_string,
-                player1: player1,
-                player2: player2,
+                idWhite: idWhite,
+                idBlack: idBlack,
                 game_time: this.knex.fn.now(),
             }
 
@@ -109,8 +109,8 @@ class DB {
         try {
             const result = await this.knex('games')
                 .select('*')
-                .where('player1', playerId)
-                .orWhere('player2', playerId)
+                .where('idWhite', playerId)
+                .orWhere('idBlack', playerId)
                 .limit(take)
                 .offset(skip);
             return result;

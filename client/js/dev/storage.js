@@ -5,6 +5,7 @@ export default class Storage{
         this.chessName = "chess";
         this.rwName = "rw";
         this.profileName = "profile";
+        this.historyName = "history";
 
         this.playerId = parseInt(localStorage.playerId);
         this.api = new API();
@@ -18,7 +19,8 @@ export default class Storage{
         if(!localStorage.gameType 
             || (localStorage.gameType !== this.chessName
                 && localStorage.gameType !== this.rwName
-                && localStorage.gameType !== this.profileName)
+                && localStorage.gameType !== this.profileName
+                && localStorage.gameType !== this.historyName)
             ){
             localStorage.gameType = this.chessName;
         }
@@ -41,6 +43,12 @@ export default class Storage{
 
         //bind everything
         document.querySelector('#playerId').innerHTML = userInfo.email;
+    }
+
+    setNickname(nickname){
+        const userInfo = this.getUserInfo();
+        userInfo.nickname = nickname;
+        this.setUserInfo(userInfo);
     }
 
     getAuth() {

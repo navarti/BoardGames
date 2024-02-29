@@ -31,9 +31,12 @@ export default class Profile{
         document.querySelector('#saveChangesButton').onclick = async () => {
             const res = await window.storage.api.postNickname(document.querySelector('#profile-section__nickname').value);
             if(res.status === 200){
-                window.location.reload();
+                alert('The nickname was successfully updated');
+                window.storage.setNickname(document.querySelector('#profile-section__nickname').value);
+                return;
             }
             if(res.status === 400){
+                document.querySelector('#profile-section__nickname').value = window.storage.getUserInfo().nickname;
                 alert('This nickname is not allowed');
                 return;
             }
