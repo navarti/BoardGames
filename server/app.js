@@ -25,13 +25,9 @@ class App {
 
         this.app.get('/client',   (req, res) => router.onClient(req, res));
         this.app.get('/auth',   (req, res) => router.onAuth(req, res));
+        this.app.get('/history',   (req, res) => router.onGetHistory(req, res));
         this.app.post('/upd_nickname',   (req, res) => router.onChangeNickName(req, res));
 
-        //old
-
-        // const httpServer = this.app.listen(this.port, this.onListen());
-
-        // new
         const options = {
             key: global.fileManager.getServerKey(),
             cert: global.fileManager.getServerCrt(),
@@ -40,7 +36,6 @@ class App {
         const httpsServer = https.createServer(options, this.app);
         httpsServer.listen(this.port, this.onListen());
 
-        //same
         this.socket = new Socket(httpsServer);
     }
 

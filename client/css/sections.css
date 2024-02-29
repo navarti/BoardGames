@@ -21,14 +21,12 @@
     gap: 5px;
 }
 
-#gameboard{
+.gameboard{
     width: 320px;
     height: 320px;
     display: flex;
     flex-wrap: wrap;
 }
-
-
 
 .profile-section{
     display: flex;
@@ -39,3 +37,15 @@
     gap: 10px;
 }
 
+.history-section{
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    gap: 10px;
+}
+
+#history-list{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}

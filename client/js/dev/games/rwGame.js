@@ -27,7 +27,7 @@ export default class RWGame{
         this.infoDisplay = document.querySelector('#info-display')
         
         //setting board up
-        this.gameBoardName = 'gameboard';
+        this.gameBoardName = 'main-gameboard';
         this.gameBoard = Chessboard(this.gameBoardName, {
             draggable: true,
             dropOffBoard: 'trash',

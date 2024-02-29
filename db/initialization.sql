@@ -4,7 +4,9 @@ CREATE TABLE IF NOT EXISTS `users` (
   `email` VARCHAR(45) NULL,
   `lastactive_date` TIMESTAMP NULL,
   `registration_date` TIMESTAMP NULL,
-  PRIMARY KEY (`user_id`));
+  PRIMARY KEY (`user_id`),
+  UNIQUE('email')
+  );
 
 ---
 

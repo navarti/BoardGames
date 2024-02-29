@@ -46,6 +46,16 @@ export default class API{
         return data;
     }
 
+    async getHistory(skip=0, take=10){    
+        const res = await this.GETRequest(this.serverURL + '/history?', {
+            key: window.storage.getAuth(), 
+            skip: skip, 
+            take: take
+        });    
+        const data = await this.getJsonFromRes(res);
+        return data;
+    }
+
     async postNickname(newNickname){
         const body = {
             nickname: newNickname,

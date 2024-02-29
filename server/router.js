@@ -83,6 +83,35 @@ class Router {
         // res.redirect('/');
         this.ok(res);
     }
+    
+    async onGetHistory(req, res) {
+        res.set('Access-Control-Allow-Origin', '*');
+        const key = req.query.key;
+        
+        if(!key){
+            this.unathorized(res);
+            return;
+        }
+
+        if(!global.auth.checkKey(key)) {
+            this.unathorized(res);
+            return;
+        }
+
+        const skip = parseInt(req.query.skip);
+        const take = parseInt(req.query.take);
+
+        const email = global.auth.getEmail(key, skip, take);
+
+        const history = await global.db.getHistoryByEmail(email, skip, take);
+
+        if(!history){
+            this.badRequest(res);
+            return;
+        }
+    
+        res.json(history);
+    }
 }
 
 export default Router;

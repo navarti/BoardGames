@@ -62,7 +62,7 @@
                 <div class="nav-links">
                     <a id="chessButton">Chess</a>
                     <a id="rwButton">Rabbit and Wolfs</a>
-                    <a id="changeThemeButton">Theme</a>
+                    <a id="changeThemeButton" href="">Theme</a>
                     <a id="gameHistoryButton">Game History</a>
                     <a id="profileButton">Profile</a>
                     <a id="logButton">Log in</a>
@@ -81,14 +81,19 @@
                 <div class="game-div">
                     <p>You play for <span id="playFor"></span></p>
                     <button id="revertBoardButton">Revert board</button>
-                    <div id="gameboard"></div>
+                    <div id="main-gameboard" class="gameboard"></div>
                     <p id="info-display"></p>
                 </div>
             </div>
 
             <div class="history-section d-none">
+                <div id="history-list">
+                    <p>List of recent games: </p>
+                </div>
 
-
+                <div id="history-board" class="gameboard">
+                    <div id="history-gameboard"></div>
+                </div>
             </div>
 
             <div class="profile-section d-none">

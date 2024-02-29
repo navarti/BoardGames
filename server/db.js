@@ -105,14 +105,15 @@ class DB {
         }
     }
 
-    async getGamesByPlayerId(playerId, skip, take){
+    async getHistoryByEmail(email, skip=0, take=0){
         try {
             const result = await this.knex('games')
-                .select('*')
-                .where('idWhite', playerId)
-                .orWhere('idBlack', playerId)
+                .join(this.knex.raw('?? ON (?? = ?? OR ?? = ??)', ['users', 'games.idWhite', 'users.user_id', 'games.idBlack', 'users.user_id']))
+                .select('games.*')
+                .where('users.email', email)
                 .limit(take)
-                .offset(skip);
+                .offset(skip);                
+
             return result;
         } catch (err) {
             console.log(`Error in getGamesByPlayerId: ${err}`);
