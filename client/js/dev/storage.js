@@ -15,6 +15,17 @@ export default class Storage{
         this.socket = socket;
     }
 
+    getSkipHistory(){
+        if(!localStorage.skipHistory){
+            localStorage.skipHistory = 0;
+        }
+        return localStorage.skipHistory;
+    }
+
+    setSkipHistory(skip){
+        localStorage.skipHistory = skip;
+    }
+
     getTypeOfGame(){
         if(!localStorage.gameType 
             || (localStorage.gameType !== this.chessName

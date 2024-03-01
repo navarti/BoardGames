@@ -22,11 +22,8 @@ export default class Profile{
             document.querySelector('.profile-section').classList.remove('d-none');
             window.storage.setTypeOfGame(window.storage.profileName);
             document.querySelector('.game-section').classList.add('d-none');
+            document.querySelector('.history-section').classList.add('d-none');
         }
-
-        // document.querySelector('#profileButton').addEventListener('click', () => {
-        //     document.querySelector('.profile-section').classList.remove('d-none');  
-        // });
 
         document.querySelector('#saveChangesButton').onclick = async () => {
             const res = await window.storage.api.postNickname(document.querySelector('#profile-section__nickname').value);

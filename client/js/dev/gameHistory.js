@@ -1,13 +1,16 @@
 export default class GameHistory{
     constructor(){
-        
+        this.load = true;
+
+        console.log(localStorage.skipHistory);
         if(!window.storage.getAuth()){
             this.bindButtonsWithoutLogIn();
             return;
         }
 
-        this.skip = 0;
-        this.take = 10;
+        this.skip = parseInt(window.storage.getSkipHistory());
+        this.take = 3;
+        this.maxMatches = 100;
 
         this.bindButtons();
     }
@@ -20,12 +23,39 @@ export default class GameHistory{
 
     bindButtons(){
         document.querySelector('#gameHistoryButton').onclick = async () => {
+            if(!this.load){
+                return;
+            }
+            this.load = false;
+
             document.querySelector('.history-section').classList.remove('d-none');
             window.storage.setTypeOfGame(window.storage.historyName);
             document.querySelector('.game-section').classList.add('d-none');
             document.querySelector('.profile-section').classList.add('d-none');
 
             await this.drawTable();
+        }
+        
+        document.querySelector('#historyPreviousButton').onclick = async () => {
+            if(this.skip - this.take < 0){
+                alert('No more matches to show');
+                return;
+            }
+            this.skip -= this.take;
+            window.storage.setSkipHistory(this.skip);
+
+            window.location.reload();
+        }
+
+        document.querySelector('#historyNextButton').onclick = async () => {
+            if(this.skip + this.take > this.maxMatches){
+                alert('No more matches to show');
+                return;
+            }
+            this.skip += this.take;
+            window.storage.setSkipHistory(this.skip);
+            
+            window.location.reload();
         }
     }
 

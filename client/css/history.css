@@ -4,3 +4,13 @@
     align-items: center;
     cursor: pointer;
 }
+
+#history-buttons {
+    display: flex;
+    justify-content: space-around;
+    width: 175px;
+}
+
+.history-button{
+    width: 75px;
+}
