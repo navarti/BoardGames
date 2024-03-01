@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS `games` (
   `idWhite` VARCHAR(36) NULL,
   `idBlack` VARCHAR(36) NULL,
   `game_time` TIMESTAMP NULL,
+  `winner` CHAR(1) NULL,
   PRIMARY KEY (`game_id`),
   FOREIGN KEY ('idWhite') REFERENCES 'users'('user_id'),
   FOREIGN KEY ('idBlack') REFERENCES 'users'('user_id')

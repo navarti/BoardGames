@@ -15,7 +15,7 @@ class ChessGame {
         this.players['w'] = idWhite;
         this.players['b'] = idBlack;
 
-        this.surrendedBy = null;
+        this.winner = null;
 
         this.engine = new Chess();
         this.fen = this.engine.fen();

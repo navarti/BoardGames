@@ -84,7 +84,7 @@ class DB {
         }
     }
 
-    async createGame(game_type, fen_string, idWhite, idBlack){
+    async createGame(game_type, fen_string, idWhite, idBlack, winner){
         try{
             let game = {
                 game_id: uuid.v4(),
@@ -93,6 +93,7 @@ class DB {
                 idWhite: idWhite,
                 idBlack: idBlack,
                 game_time: this.knex.fn.now(),
+                winner: winner,
             }
 
             const result = await this.knex('games').insert(game);

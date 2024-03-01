@@ -86,8 +86,7 @@ class GameDistributor {
 
     async onSurrended(playerId){
         const game = this.playersToGamesDict[playerId];
-        game.surrendedBy = playerId;
-
+        game.winner = game.idWhite === playerId ? 'b' : 'w';
         await this.onDisposeGame(playerId);
     }
 
@@ -99,7 +98,7 @@ class GameDistributor {
         const game = this.playersToGamesDict[playerId];
         delete this.playersToGamesDict[game.idWhite];
         delete this.playersToGamesDict[game.idBlack];
-        await global.db.createGame(game.type, game.engine.fen(), game.idWhite, game.idBlack);
+        await global.db.createGame(game.type, game.engine.fen(), game.idWhite, game.idBlack, game.winner);
     }
 }
 

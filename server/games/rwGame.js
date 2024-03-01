@@ -15,7 +15,7 @@ class RWGame {
         this.players['w'] = idWhite;
         this.players['b'] = idBlack;
 
-        this.surrendedBy = null;
+        this.winner = null;
         
         this.engine = new RabbitWolfs();
         this.fen = this.engine.fen();

@@ -57,7 +57,7 @@ class Socket {
                     }
                     if(game.isGameOver()){
                         global.gameDistributor.onDisposeGame(this.socketsToIdsDict[socket.id]);
-                        
+                        console.log(game.engine.turn());
                         socket.emit('gameOver-notify');
                         socket.to(game.idWhite).emit('gameOver-notify');
                         socket.to(game.idBlack).emit('gameOver-notify');
