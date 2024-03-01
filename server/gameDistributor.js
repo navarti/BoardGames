@@ -12,18 +12,18 @@ class GameDistributor {
         this.counterGameId = 1;
         this.gameList = [];
         this.playersToGamesDict = {};
+
+        this.friendsInvites = [];
+        this.invitorsToIndexesInInvites = {};
+        this.opponentsToIndexesInInvites = {};
     }
 
     onCanCreateGame(playerId){
-        //check if player is not waiting for game already and not having game in progress
+        //check if player is not waiting for game (not in queue) already and not having game in progress
 
-        let isInQueue = false;
-        for(let i=0; i<this.playersInQueue.length; i++){
-            if(this.playersInQueue[i].playerId === playerId){
-                isInQueue = true;
-            }
-        }
-        return !isInQueue && !this.getGameByPlayerId(playerId);
+        return !this.invitorsToIndexesInInvites[playerId] 
+            && !this.playersToIndexesInQueue[playerId] 
+            && !this.getGameByPlayerId(playerId);
     }
 
     //return players obj if game created, null if added a player to a queue  
@@ -45,6 +45,7 @@ class GameDistributor {
                 else if(gameType === this.rwName){
                     this.addRWGame(playerId, opponentId);
                 }
+                delete this.playersToIndexesInQueue[opponentId];
 
                 return {
                     player1: playerId, 
@@ -99,6 +100,26 @@ class GameDistributor {
         delete this.playersToGamesDict[game.idWhite];
         delete this.playersToGamesDict[game.idBlack];
         await global.db.createGame(game.type, game.engine.fen(), game.idWhite, game.idBlack, game.winner);
+    }
+
+    onCreateInviteFriend(invitorId, opponentId, gameType){
+        this.invitorsToIndexesInInvites[invitorId] = this.friendsInvites.length;
+        this.opponentsToIndexesInInvites[opponentId] = this.friendsInvites.length;
+        this.friendsInvites.push({gameType: gameType, invitor: invitorId, opponent: opponentId});
+    }
+
+    onAcceptInviteFriend(playerId){
+        const invite = this.friendsInvites[this.opponentsToIndexesInInvites[playerId]];
+
+        if(gameType === this.chessName){
+            this.addChessGame(invite.invitor, invite.opponent);
+        }
+        else if(gameType === this.rwName){
+            this.addRWGame(invite.invitor, invite.opponent);
+        }
+
+        delete this.opponentsToIndexesInInvites[playerId];
+        delete this.invitorsToIndexesInInvites[playerId];
     }
 }
 

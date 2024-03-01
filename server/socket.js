@@ -108,6 +108,16 @@ class Socket {
                 socket.to(game.idWhite).emit('surrender-notify', this.socketsToIdsDict[socket.id]);
                 socket.to(game.idBlack).emit('surrender-notify', this.socketsToIdsDict[socket.id]);
             });
+            socket.on('invite-friend', (friendEmail) => {
+                if(!global.gameDistributor.onCanCreateGame(this.socketsToIdsDict[socket.id])){
+                    socket.emit('send-alert', 'You have game in progress');
+                    return;
+                }
+                
+                
+            
+            });
+
         });
     }
 }
