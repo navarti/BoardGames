@@ -1,7 +1,0 @@
-{
-    "client": "546194974490-rl2uga1t72bha3fs0ci30uv9h0s7ovuh.apps.googleusercontent.com",
-    "secret": "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",
-    "jwt_secret": "15e16cd80c45cee2a620cfa633dd9baed4b53cf086378d66b1a79d5704d3b59f",
-    "redirect": "https://localhost:3000/auth",
-    "main": "http://localhost:5500"
-}
